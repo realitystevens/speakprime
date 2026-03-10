@@ -173,12 +173,10 @@ async def interview_websocket(
                                 audio_bytes = message["bytes"]
                                 await gemini_session.send(
                                     input=types.LiveClientRealtimeInput(
-                                        media_chunks=[
-                                            types.Blob(
-                                                mime_type="audio/pcm;rate=16000",
-                                                data=audio_bytes,
-                                            )
-                                        ]
+                                        audio=types.Blob(
+                                            mime_type="audio/pcm;rate=16000",
+                                            data=audio_bytes,
+                                        )
                                     )
                                 )
 
@@ -215,9 +213,10 @@ async def interview_websocket(
                         timestamp = time.time() - session_start_time
 
                         # Audio response → forward as binary
-                        if response.data:
+                        audio_data = getattr(response, "data", None)
+                        if audio_data:
                             try:
-                                await websocket.send_bytes(response.data)
+                                await websocket.send_bytes(audio_data)
                             except Exception:
                                 break
 
@@ -431,12 +430,10 @@ async def presentation_websocket(
                                 audio_bytes = base64.b64decode(data["data"])
                                 await gemini_session.send(
                                     input=types.LiveClientRealtimeInput(
-                                        media_chunks=[
-                                            types.Blob(
-                                                mime_type="audio/pcm;rate=16000",
-                                                data=audio_bytes,
-                                            )
-                                        ]
+                                        audio=types.Blob(
+                                            mime_type="audio/pcm;rate=16000",
+                                            data=audio_bytes,
+                                        )
                                     )
                                 )
                             except Exception as e:
@@ -476,10 +473,11 @@ async def presentation_websocket(
 
                         timestamp = time.time() - session_start_time
 
-                        if response.data:
+                        audio_data = getattr(response, "data", None)
+                        if audio_data:
                             try:
                                 encoded = base64.b64encode(
-                                    response.data).decode("utf-8")
+                                    audio_data).decode("utf-8")
                                 await websocket.send_json({"type": "audio", "data": encoded})
                             except Exception:
                                 break
