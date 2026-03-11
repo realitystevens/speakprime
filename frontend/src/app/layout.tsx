@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "../styles/index.css";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Speakprime",
@@ -13,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body style={{ background: "#111111", fontFamily: "Inter, sans-serif" }}>
+      <body className="bg-[#111111]">
         {children}
       </body>
     </html>

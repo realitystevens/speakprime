@@ -11,12 +11,10 @@ function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void 
   return (
     <button
       onClick={() => onChange(!on)}
-      className="relative inline-flex items-center rounded-full transition-colors duration-200"
-      style={{ width: "44px", height: "24px", background: on ? "#3B82F6" : "#2a2a2a" }}
+      className={`relative inline-flex items-center w-11 h-6 rounded-full transition-colors duration-200 ${on ? "bg-blue-500" : "bg-[#2a2a2a]"}`}
     >
       <span
-        className="inline-block w-5 h-5 rounded-full bg-white shadow transition-transform duration-200"
-        style={{ transform: on ? "translateX(22px)" : "translateX(2px)" }}
+        className={`inline-block w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${on ? "translate-x-[22px]" : "translate-x-[2px]"}`}
       />
     </button>
   );

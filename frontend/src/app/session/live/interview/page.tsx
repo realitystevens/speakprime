@@ -42,12 +42,7 @@ function highlightFiller(text: string) {
     fillerWords.some((fw) => fw.toLowerCase() === part.toLowerCase()) ? (
       <mark
         key={i}
-        style={{
-          background: "rgba(245,158,11,0.25)",
-          color: "#F59E0B",
-          borderRadius: "2px",
-          padding: "0 2px",
-        }}
+        className="bg-amber-500/25 text-amber-500 rounded-[2px] px-0.5"
       >
         {part}
       </mark>
@@ -143,55 +138,39 @@ export default function LiveInterviewPage() {
 
   return (
     <div
-      className="h-screen w-screen overflow-hidden relative select-none"
-      style={{ background: "#1c1c1c" }}
+      className="h-screen w-screen overflow-hidden relative select-none bg-[#1c1c1c]"
     >
-      <style>{`
-        @keyframes waveform { 0%, 100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
-        @keyframes pulseDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-        @keyframes speakRing { 0% { opacity: 0.8; transform: scale(1); } 100% { opacity: 0; transform: scale(1.3); } }
-        @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes panelSlide { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        .feedback-toast { animation: fadeSlideUp 0.3s ease; }
-        .coach-panel { animation: panelSlide 0.3s cubic-bezier(0.4,0,0.2,1); }
-      `}</style>
 
       {/* ── MAIN STAGE: AI Interviewer ── */}
       <div className="absolute inset-0 flex items-center justify-center" style={{ paddingRight: showPanel ? "380px" : "0", transition: "padding 0.3s ease" }}>
         {/* Ambient background radial */}
-        <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse 60% 50% at 50% 45%, rgba(59,130,246,0.03) 0%, transparent 70%)" }} />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_45%,rgba(59,130,246,0.03)_0%,transparent_70%)]" />
 
         {/* AI Interviewer tile */}
         <div
-          className="relative flex flex-col items-center justify-center rounded-3xl"
-          style={{
-            width: "min(580px, 88vw)",
-            padding: "52px 48px",
-            background: "rgba(40,40,40,0.85)",
-            backdropFilter: "blur(20px)",
-            border: aiSpeaking ? "1px solid rgba(59,130,246,0.4)" : "1px solid rgba(255,255,255,0.07)",
-            boxShadow: aiSpeaking ? "0 0 60px rgba(59,130,246,0.15)" : "0 24px 80px rgba(0,0,0,0.7)",
-            transition: "border 0.4s, box-shadow 0.4s",
-          }}
+          className={`relative flex flex-col items-center justify-center rounded-3xl w-[min(580px,88vw)] px-12 py-[52px] bg-[rgba(40,40,40,0.85)] backdrop-blur-xl transition-[border,box-shadow] duration-[400ms] ${
+            aiSpeaking
+              ? "border border-blue-500/40 shadow-[0_0_60px_rgba(59,130,246,0.15)]"
+              : "border border-white/[0.07] shadow-[0_24px_80px_rgba(0,0,0,0.7)]"
+          }`}
         >
           {/* Avatar */}
           <div className="relative mb-6">
             <div
-              className="w-28 h-28 rounded-full flex items-center justify-center"
-              style={{ background: "linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%)" }}
+              className="w-28 h-28 rounded-full flex items-center justify-center bg-gradient-to-br from-blue-700 to-violet-700"
             >
-              <span style={{ color: "white", fontSize: "32px", fontWeight: 800 }}>AI</span>
+              <span className="text-white text-[32px] font-extrabold">AI</span>
             </div>
             {aiSpeaking && (
               <>
-                <div className="absolute inset-0 rounded-full" style={{ border: "2px solid #3B82F6", animation: "speakRing 1.2s ease infinite" }} />
-                <div className="absolute -inset-3 rounded-full" style={{ border: "1px solid rgba(59,130,246,0.3)", animation: "speakRing 1.2s ease 0.4s infinite" }} />
+                <div className="absolute inset-0 rounded-full border-2 border-blue-500 animate-speak-ring" />
+                <div className="absolute -inset-3 rounded-full border border-blue-500/30 animate-speak-ring-delayed" />
               </>
             )}
           </div>
 
           {/* Name + status */}
-          <p style={{ color: "#F8FAFC", fontSize: "20px", fontWeight: 700, marginBottom: "6px" }}>
+          <p className="text-[#F8FAFC] text-xl font-bold mb-1.5">
             Speakprime AI Interviewer
           </p>
           <div className="flex items-center gap-2 mb-8">
@@ -202,25 +181,24 @@ export default function LiveInterviewPage() {
                     <div key={i} className="w-1 rounded-sm" style={{ height: "100%", background: "#3B82F6", animation: `waveform 0.5s ease ${d}s infinite` }} />
                   ))}
                 </div>
-                <span style={{ color: "#3B82F6", fontSize: "13px", fontWeight: 500 }}>Speaking…</span>
+                <span className="text-blue-500 text-[13px] font-medium">Speaking…</span>
               </>
             ) : (
               <>
-                <div className="w-2 h-2 rounded-full" style={{ background: "#22C55E", animation: "pulseDot 2s infinite" }} />
-                <span style={{ color: "#64748B", fontSize: "13px" }}>Listening…</span>
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse-dot" />
+                <span className="text-slate-500 text-[13px]">Listening…</span>
               </>
             )}
           </div>
 
           {/* Current Question card */}
           <div
-            className="w-full rounded-2xl p-5"
-            style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.2)" }}
+            className="w-full rounded-2xl p-5 bg-blue-500/[0.08] border border-blue-500/20"
           >
-            <p style={{ color: "#64748B", fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>
+            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.08em] mb-2">
               Current Question
             </p>
-            <p style={{ color: "#F8FAFC", fontSize: "15px", lineHeight: 1.65, fontWeight: 500 }}>
+            <p className="text-[#F8FAFC] text-[15px] leading-[1.65] font-medium">
               "Tell me about a time you had to influence a team without authority."
             </p>
           </div>
@@ -229,35 +207,25 @@ export default function LiveInterviewPage() {
 
       {/* ── USER WEBCAM PIP ── */}
       <div
-        className="absolute z-20 rounded-2xl overflow-hidden"
-        style={{
-          bottom: "90px",
-          right: showPanel ? "396px" : "16px",
-          width: "200px",
-          height: "148px",
-          border: "2px solid rgba(255,255,255,0.12)",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.7)",
-          transition: "right 0.3s ease",
-          background: "#111827",
-        }}
+        className="absolute z-20 rounded-2xl overflow-hidden bottom-[90px] w-[200px] h-[148px] border-2 border-white/[0.12] shadow-[0_8px_32px_rgba(0,0,0,0.7)] bg-[#111827] transition-[right] duration-300 ease-out"
+        style={{ right: showPanel ? "396px" : "16px" }}
       >
         <video
           ref={videoRef}
           autoPlay
           muted
           playsInline
-          className="w-full h-full object-cover"
-          style={{ opacity: cameraOff ? 0 : 1 }}
+          className={`w-full h-full object-cover ${cameraOff ? "opacity-0" : "opacity-100"}`}
         />
         {cameraOff && (
-          <div className="absolute inset-0 flex items-center justify-center" style={{ background: "#111827" }}>
+          <div className="absolute inset-0 flex items-center justify-center bg-[#111827]">
             <VideoOff size={28} color="#334155" />
           </div>
         )}
         {/* Name bar */}
-        <div className="absolute bottom-0 left-0 right-0 px-3 py-2" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent)" }}>
+        <div className="absolute bottom-0 left-0 right-0 px-3 py-2 bg-gradient-to-t from-black/85 to-transparent">
           <div className="flex items-center gap-1.5">
-            <span style={{ color: "white", fontSize: "11px", fontWeight: 600 }}>You</span>
+            <span className="text-white text-[11px] font-semibold">You</span>
             {muted && <MicOff size={10} color="#EF4444" />}
           </div>
         </div>
@@ -268,81 +236,69 @@ export default function LiveInterviewPage() {
         {/* Left cluster */}
         <div className="flex items-center gap-2 flex-wrap">
           <div
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-            style={{ background: "rgba(239,68,68,0.92)", backdropFilter: "blur(8px)" }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[rgba(239,68,68,0.92)] backdrop-blur-sm"
           >
-            <div className="w-1.5 h-1.5 rounded-full bg-white" style={{ animation: "pulseDot 1.5s infinite" }} />
-            <span style={{ color: "white", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em" }}>LIVE</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse-dot-fast" />
+            <span className="text-white text-[11px] font-bold tracking-[0.06em]">LIVE</span>
           </div>
           <div
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-            style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.1)" }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/55 backdrop-blur-xl border border-white/10"
           >
             <Wifi size={12} color="#22C55E" />
-            <span style={{ color: "#F8FAFC", fontSize: "13px", fontWeight: 600, fontFamily: "monospace" }}>{formatTime(timer)}</span>
+            <span className="text-[#F8FAFC] text-[13px] font-semibold font-mono">{formatTime(timer)}</span>
           </div>
           <div
-            className="hidden sm:flex px-3 py-1.5 rounded-full"
-            style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.07)" }}
+            className="hidden sm:flex px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-xl border border-white/[0.07]"
           >
-            <span style={{ color: "#94A3B8", fontSize: "12px" }}>Behavioral · Senior PM</span>
+            <span className="text-slate-400 text-xs">Behavioral · Senior PM</span>
           </div>
         </div>
 
         {/* Right cluster */}
         <div className="flex items-center gap-2">
           <div
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-            style={{ background: confidenceConfig.bg, border: `1px solid ${confidenceConfig.color}35`, backdropFilter: "blur(8px)" }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-sm"
+            style={{ background: confidenceConfig.bg, border: `1px solid ${confidenceConfig.color}35` }}
           >
             <div className="w-2 h-2 rounded-full" style={{ background: confidenceConfig.dot }} />
-            <span style={{ color: confidenceConfig.color, fontSize: "12px", fontWeight: 600 }}>{confidenceConfig.label}</span>
+            <span className="text-[12px] font-semibold" style={{ color: confidenceConfig.color }}>{confidenceConfig.label}</span>
           </div>
           <div
-            className="hidden sm:flex px-3 py-1.5 rounded-full"
-            style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.1)" }}
+            className="hidden sm:flex px-3 py-1.5 rounded-full bg-black/55 backdrop-blur-xl border border-white/10"
           >
-            <span style={{ color: "#94A3B8", fontSize: "12px" }}>
-              Filler words: <span style={{ color: "#F59E0B", fontWeight: 600 }}>{fillerCount}</span>
+            <span className="text-slate-400 text-xs">
+              Filler words: <span className="text-amber-500 font-semibold">{fillerCount}</span>
             </span>
           </div>
           {/* Coach panel toggle */}
           <button
             onClick={() => setShowPanel(!showPanel)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all"
-            style={{
-              background: showPanel ? "rgba(59,130,246,0.35)" : "rgba(0,0,0,0.55)",
-              backdropFilter: "blur(16px)",
-              border: showPanel ? "1px solid rgba(59,130,246,0.5)" : "1px solid rgba(255,255,255,0.1)",
-              color: showPanel ? "#93C5FD" : "#94A3B8",
-            }}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-xl transition-all ${
+              showPanel
+                ? "bg-blue-500/35 border border-blue-500/50 text-blue-300"
+                : "bg-black/55 border border-white/10 text-slate-400"
+            }`}
           >
             <MessageSquare size={13} />
-            <span style={{ fontSize: "12px", fontWeight: 500 }}>Coach</span>
-            <ChevronRight size={12} style={{ transform: showPanel ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} />
+            <span className="text-[12px] font-medium">Coach</span>
+            <ChevronRight size={12} className={`transition-transform duration-200 ${showPanel ? "rotate-180" : ""}`} />
           </button>
         </div>
       </div>
 
       {/* ── FEEDBACK TOASTS (bottom-left) ── */}
-      <div
-        className="absolute z-20 space-y-2"
-        style={{ bottom: "90px", left: "16px", maxWidth: "340px" }}
-      >
+      <div className="absolute z-20 space-y-2 bottom-[90px] left-4 max-w-[340px]">
         {feedbacks.map((f) => (
           <div
             key={f.id}
-            className="feedback-toast px-4 py-3 rounded-2xl"
+            className="feedback-toast px-4 py-3 rounded-2xl bg-[rgba(18,18,18,0.92)] backdrop-blur-2xl shadow-[0_4px_20px_rgba(0,0,0,0.5)]"
             style={{
-              background: "rgba(18,18,18,0.92)",
-              backdropFilter: "blur(20px)",
               borderLeft: `3px solid ${feedbackColors[f.type].border}`,
               border: `1px solid ${feedbackColors[f.type].border}25`,
               borderLeftWidth: "3px",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
             }}
           >
-            <span style={{ color: "#F1F5F9", fontSize: "13px", lineHeight: 1.5 }}>
+            <span className="text-slate-100 text-[13px] leading-[1.5]">
               {emoji[f.type]} {f.text}
             </span>
           </div>
@@ -352,50 +308,38 @@ export default function LiveInterviewPage() {
       {/* ── BOTTOM CONTROL BAR ── */}
       <div className="absolute bottom-5 left-0 right-0 flex items-center justify-center z-20" style={{ paddingRight: showPanel ? "380px" : "0", transition: "padding 0.3s ease" }}>
         <div
-          className="flex items-center gap-3 px-5 py-3 rounded-full"
-          style={{
-            background: "rgba(10,14,26,0.88)",
-            backdropFilter: "blur(24px)",
-            border: "1px solid rgba(255,255,255,0.09)",
-            boxShadow: "0 8px 40px rgba(0,0,0,0.7)",
-          }}
-        >
+          className="flex items-center gap-3 px-5 py-3 rounded-full bg-[rgba(10,14,26,0.88)] backdrop-blur-2xl border border-white/[0.09] shadow-[0_8px_40px_rgba(0,0,0,0.7)]">
           {/* Progress */}
-          <div className="hidden md:flex items-center gap-2 pr-4" style={{ borderRight: "1px solid rgba(255,255,255,0.1)" }}>
-            <div className="w-28 h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.1)" }}>
+          <div className="hidden md:flex items-center gap-2 pr-4 border-r border-white/10">
+            <div className="w-28 h-1 rounded-full overflow-hidden bg-white/10">
               <div
                 className="h-full rounded-full transition-all duration-1000"
                 style={{ width: `${Math.min((timer / (30 * 60)) * 100, 100)}%`, background: "linear-gradient(90deg, #3B82F6, #8B5CF6)" }}
               />
             </div>
-            <span style={{ color: "#64748B", fontSize: "11px", fontFamily: "monospace" }}>{formatTime(timer)}/30:00</span>
+            <span className="text-slate-500 text-[11px] font-mono">{formatTime(timer)}/30:00</span>
           </div>
 
           {/* Mic */}
           <button
             onClick={() => setMuted(!muted)}
-            className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105"
-            style={{ background: muted ? "#EF4444" : "rgba(255,255,255,0.12)" }}
-            title={muted ? "Unmute" : "Mute"}
-          >
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 ${muted ? "bg-red-500" : "bg-white/[0.12]"}`}
+            title={muted ? "Unmute" : "Mute"}>
             {muted ? <MicOff size={19} color="white" /> : <Mic size={19} color="white" />}
           </button>
 
           {/* Camera */}
           <button
             onClick={() => setCameraOff(!cameraOff)}
-            className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105"
-            style={{ background: cameraOff ? "#EF4444" : "rgba(255,255,255,0.12)" }}
-            title={cameraOff ? "Turn camera on" : "Turn camera off"}
-          >
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 ${cameraOff ? "bg-red-500" : "bg-white/[0.12]"}`}
+            title={cameraOff ? "Turn camera on" : "Turn camera off"}>
             {cameraOff ? <VideoOff size={19} color="white" /> : <Video size={19} color="white" />}
           </button>
 
           {/* Pause */}
           <button
             onClick={() => setPaused(!paused)}
-            className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105"
-            style={{ background: "rgba(255,255,255,0.12)" }}
+            className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 bg-white/[0.12]"
             title={paused ? "Resume" : "Pause"}
           >
             {paused ? <Play size={19} color="white" /> : <Pause size={19} color="white" />}
@@ -404,9 +348,7 @@ export default function LiveInterviewPage() {
           {/* End Session */}
           <button
             onClick={() => setShowEndConfirm(true)}
-            className="flex items-center gap-2 px-5 h-12 rounded-full transition-all duration-200 hover:scale-105 hover:bg-red-600 ml-2"
-            style={{ background: "#EF4444", color: "white", fontSize: "13px", fontWeight: 600 }}
-          >
+            className="flex items-center gap-2 px-5 h-12 rounded-full transition-all duration-200 hover:scale-105 hover:bg-red-600 ml-2 bg-red-500 text-white text-[13px] font-semibold">
             <PhoneOff size={17} color="white" />
             <span className="hidden sm:inline">End Session</span>
           </button>
@@ -416,40 +358,34 @@ export default function LiveInterviewPage() {
       {/* ── RIGHT COACH PANEL ── */}
       {showPanel && (
         <div
-          className="coach-panel absolute top-0 right-0 bottom-0 z-30 flex flex-col"
-          style={{
-            width: "380px",
-            background: "rgba(22,22,22,0.97)",
-            backdropFilter: "blur(32px)",
-            borderLeft: "1px solid rgba(255,255,255,0.07)",
-          }}
+          className="coach-panel absolute top-0 right-0 bottom-0 z-30 flex flex-col w-[380px] bg-[rgba(22,22,22,0.97)] backdrop-blur-[32px] border-l border-white/[0.07]"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+          <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.07]">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #3B82F6, #8B5CF6)" }}>
-                <span style={{ color: "white", fontSize: "10px", fontWeight: 800 }}>AI</span>
+              <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-violet-500">
+                <span className="text-white text-[10px] font-extrabold">AI</span>
               </div>
               <div>
-                <p style={{ color: "#F8FAFC", fontSize: "14px", fontWeight: 700 }}>Speakprime AI</p>
+                <p className="text-[#F8FAFC] text-sm font-bold">Speakprime AI</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#22C55E", animation: "pulseDot 2s infinite" }} />
-                <span style={{ color: "#22C55E", fontSize: "11px" }}>Active</span>
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse-dot" />
+                <span className="text-green-500 text-[11px]">Active</span>
               </div>
-              <button onClick={() => setShowPanel(false)} className="p-1 rounded-md" style={{ color: "#475569" }}>
+              <button onClick={() => setShowPanel(false)} className="p-1 rounded-md text-slate-600">
                 <X size={16} />
               </button>
             </div>
           </div>
 
           {/* Question */}
-          <div className="px-5 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-            <p style={{ color: "#475569", fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Current Question</p>
-            <div className="p-4 rounded-xl" style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.18)" }}>
-              <p style={{ color: "#F8FAFC", fontSize: "13px", lineHeight: 1.65, fontWeight: 500 }}>
+          <div className="px-5 py-4 border-b border-white/[0.07]">
+            <p className="text-slate-600 text-[10px] font-bold uppercase tracking-[0.08em] mb-2">Current Question</p>
+            <div className="p-4 rounded-xl bg-blue-500/[0.08] border border-blue-500/[0.18]">
+              <p className="text-[#F8FAFC] text-[13px] leading-[1.65] font-medium">
                 "Tell me about a time you had to influence a team without authority."
               </p>
             </div>
@@ -457,30 +393,29 @@ export default function LiveInterviewPage() {
 
           {/* Live Transcript */}
           <div className="flex-1 overflow-auto px-5 py-4">
-            <p style={{ color: "#475569", fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>Live Transcript</p>
+            <p className="text-slate-600 text-[10px] font-bold uppercase tracking-[0.08em] mb-3">Live Transcript</p>
             <div className="space-y-3">
               {transcriptLines
                 .slice(0, Math.min(Math.ceil(timer / 15) + 1, transcriptLines.length))
                 .map((line, i) => (
-                  <p key={i} style={{ color: "#94A3B8", fontSize: "13px", lineHeight: 1.75 }}>
+                  <p key={i} className="text-slate-400 text-[13px] leading-[1.75]">
                     {highlightFiller(line)}
                   </p>
                 ))}
               {timer > 0 && (
                 <span
-                  className="inline-block w-1.5 h-4 rounded-sm ml-1"
-                  style={{ background: "#3B82F6", animation: "waveform 0.8s ease infinite" }}
+                  className="inline-block w-1.5 h-4 rounded-sm ml-1 bg-blue-500 animate-waveform"
                 />
               )}
             </div>
           </div>
 
           {/* Feedback feed */}
-          <div className="px-5 py-4" style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
-            <p style={{ color: "#475569", fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>Real-Time Coaching</p>
-            <div className="space-y-2" style={{ maxHeight: "200px", overflow: "hidden" }}>
+          <div className="px-5 py-4 border-t border-white/[0.07]">
+            <p className="text-slate-600 text-[10px] font-bold uppercase tracking-[0.08em] mb-2.5">Real-Time Coaching</p>
+            <div className="space-y-2 max-h-[200px] overflow-hidden">
               {feedbacks.length === 0 && (
-                <p style={{ color: "#334155", fontSize: "12px" }}>Coaching tips will appear here…</p>
+                <p className="text-[#334155] text-xs">Coaching tips will appear here…</p>
               )}
               {feedbacks.map((f) => (
                 <div
@@ -491,7 +426,7 @@ export default function LiveInterviewPage() {
                     borderLeft: `3px solid ${feedbackColors[f.type].border}`,
                   }}
                 >
-                  <span style={{ color: "#E2E8F0", fontSize: "12px", lineHeight: 1.5 }}>
+                  <span className="text-slate-200 text-xs leading-[1.5]">
                     {emoji[f.type]} {f.text}
                   </span>
                 </div>
@@ -501,7 +436,7 @@ export default function LiveInterviewPage() {
 
           {/* AI speaking indicator */}
           {aiSpeaking && (
-            <div className="px-5 py-3 flex items-center gap-2" style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+            <div className="px-5 py-3 flex items-center gap-2 border-t border-white/[0.07]">
               <div className="flex gap-0.5 items-end h-4">
                 {[0, 0.1, 0.2, 0.15, 0.05, 0.1, 0.2].map((delay, i) => (
                   <div
@@ -511,7 +446,7 @@ export default function LiveInterviewPage() {
                   />
                 ))}
               </div>
-              <span style={{ color: "#3B82F6", fontSize: "12px", fontWeight: 500 }}>Speakprime is speaking…</span>
+              <span className="text-blue-500 text-xs font-medium">Speakprime is speaking…</span>
             </div>
           )}
         </div>
@@ -520,33 +455,27 @@ export default function LiveInterviewPage() {
       {/* ── END SESSION MODAL ── */}
       {showEndConfirm && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center"
-          style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)" }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md"
         >
           <div
-            className="p-8 rounded-3xl w-full max-w-sm"
-            style={{ background: "#111111", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 24px 80px rgba(0,0,0,0.8)" }}
+            className="p-8 rounded-3xl w-full max-w-sm bg-[#111111] border border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.8)]"
           >
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-5" style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)" }}>
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-5 bg-red-500/[0.12] border border-red-500/25">
               <PhoneOff size={22} color="#EF4444" />
             </div>
-            <h3 style={{ color: "#F8FAFC", fontSize: "18px", fontWeight: 700, textAlign: "center", marginBottom: "8px" }}>End Session?</h3>
-            <p style={{ color: "#64748B", fontSize: "14px", textAlign: "center", marginBottom: "28px", lineHeight: 1.6 }}>
+            <h3 className="text-[#F8FAFC] text-[18px] font-bold text-center mb-2">End Session?</h3>
+            <p className="text-slate-500 text-sm text-center mb-7 leading-[1.6]">
               Your session will be saved and a full performance report will be generated.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowEndConfirm(false)}
-                className="flex-1 py-3 rounded-2xl transition-opacity hover:opacity-80"
-                style={{ background: "#2a2a2a", border: "1px solid rgba(255,255,255,0.1)", color: "#94A3B8", fontSize: "14px" }}
-              >
+                className="flex-1 py-3 rounded-2xl transition-opacity hover:opacity-80 bg-[#2a2a2a] border border-white/10 text-slate-400 text-sm">
                 Cancel
               </button>
               <button
                 onClick={() => navigate.push("/session/report/1")}
-                className="flex-1 py-3 rounded-2xl transition-opacity hover:opacity-90"
-                style={{ background: "#EF4444", color: "white", fontSize: "14px", fontWeight: 600 }}
-              >
+                className="flex-1 py-3 rounded-2xl transition-opacity hover:opacity-90 bg-red-500 text-white text-sm font-semibold">
                 End & View Report
               </button>
             </div>

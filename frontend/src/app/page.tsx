@@ -80,29 +80,7 @@ export default function Home() {
   );
 
   return (
-    <div className="bg-[#111111] min-h-screen" style={{ fontFamily: "Inter, sans-serif" }}>
-      <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) scale(1); }
-          50% { transform: translateY(-20px) scale(1.05); }
-        }
-        @keyframes pulse-slow {
-          0%, 100% { opacity: 0.4; }
-          50% { opacity: 0.8; }
-        }
-        @keyframes shimmer {
-          0% { background-position: -200% center; }
-          100% { background-position: 200% center; }
-        }
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(30px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeInUp { animation: fadeInUp 0.7s ease forwards; }
-        .animate-fadeInUp-delay { animation: fadeInUp 0.7s ease 0.2s forwards; opacity: 0; }
-        .animate-fadeInUp-delay2 { animation: fadeInUp 0.7s ease 0.4s forwards; opacity: 0; }
-      `}</style>
-
+    <div className="bg-[#111111] min-h-screen">
       {/* Navbar */}
       <nav className="relative z-10 flex items-center justify-between px-6 lg:px-12 h-16 border-b border-[#2a2a2a]">
         <div className="flex items-center gap-2">
@@ -135,24 +113,24 @@ export default function Home() {
         </div>
 
         <div className="relative max-w-5xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-6 animate-fadeInUp bg-blue-500/10 border border-blue-500/30">
-            <div className="w-2 h-2 rounded-full bg-blue-500 [animation:pulse-slow_2s_infinite]" />
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-6 animate-fade-in-up bg-blue-500/10 border border-blue-500/30">
+            <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse-slow" />
             <span className="text-blue-500 text-[13px] font-medium">Powered by Gemini Live API</span>
           </div>
 
-          <h1 className="animate-fadeInUp-delay text-[#F8FAFC] text-[clamp(2.5rem,6vw,4.5rem)] font-extrabold leading-[1.1] tracking-[-0.02em] mb-6">
+          <h1 className="animate-fade-in-up-delay text-[#F8FAFC] text-[clamp(2.5rem,6vw,4.5rem)] font-extrabold leading-[1.1] tracking-[-0.02em] mb-6">
             Stop Practicing Alone.<br />
             <span className="bg-gradient-to-br from-blue-500 to-violet-500 bg-clip-text text-transparent">
               Get Coached Live.
             </span>
           </h1>
 
-          <p className="animate-fadeInUp-delay2 max-w-2xl mx-auto text-[#94A3B8] text-lg leading-[1.7] mb-10">
+          <p className="animate-fade-in-up-delay2 max-w-2xl mx-auto text-[#94A3B8] text-lg leading-[1.7] mb-10">
             Speakprime watches you, listens to you, and coaches you in real time — during interviews and presentations.
             Like having a personal coach in every session.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 animate-fadeInUp-delay2">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 animate-fade-in-up-delay2">
             <Link
               href="/session/setup"
               className="flex items-center gap-2 px-6 py-3.5 rounded-lg transition-all duration-200 hover:scale-105 bg-blue-500 text-white text-[15px] font-semibold no-underline shadow-[0_0_30px_rgba(59,130,246,0.3)]"

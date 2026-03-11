@@ -1,8 +1,3 @@
-import { LivePresentationPage } from "@/app/pages/LivePresentationPage";
-
-export default function Page() {
-  return <LivePresentationPage />;
-}
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -150,27 +145,13 @@ export function LivePresentationPage() {
 
   return (
     <div
-      className="h-screen w-screen overflow-hidden relative select-none"
-      style={{ background: "#1c1c1c" }}
+      className="h-screen w-screen overflow-hidden relative select-none bg-[#1c1c1c]"
     >
-      <style>{`
-        @keyframes waveform { 0%, 100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
-        @keyframes pulseDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-        @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes panelSlide { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        .feed-item { animation: fadeSlideUp 0.3s ease; }
-        .coach-panel { animation: panelSlide 0.3s cubic-bezier(0.4,0,0.2,1); }
-      `}</style>
 
       {/* ── MAIN STAGE: Slide ── */}
       <div
-        className="absolute inset-0 flex flex-col items-center justify-center"
-        style={{
-          paddingRight: showPanel ? "380px" : "0",
-          paddingBottom: "84px",
-          paddingTop: "68px",
-          transition: "padding 0.3s ease",
-        }}
+        className="absolute inset-0 flex flex-col items-center justify-center pt-[68px] pb-[84px] transition-[padding] duration-300"
+        style={{ paddingRight: showPanel ? "380px" : "0" }}
       >
         {/* Slide wrapper */}
         <div
@@ -178,72 +159,51 @@ export function LivePresentationPage() {
         >
           {/* Slide card */}
           <div
-            className="relative rounded-2xl overflow-hidden flex flex-col justify-center"
-            style={{
-              width: "100%",
-              maxWidth: "960px",
-              aspectRatio: "16/9",
-              maxHeight: "calc(100vh - 160px)",
-              background: "linear-gradient(135deg, #111111 0%, #1a1a1a 100%)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              boxShadow: "0 24px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04)",
-            }}
+          className="relative rounded-2xl overflow-hidden flex flex-col justify-center w-full max-w-[960px] aspect-video max-h-[calc(100vh-160px)] bg-gradient-to-br from-[#111111] to-[#1a1a1a] border border-white/[0.08] shadow-[0_24px_80px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.04)]"
           >
             {/* Slide quality badge */}
             <div
-              className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+              className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-sm"
               style={{
                 background: qualityColors[currentSlide.quality].bg,
                 border: `1px solid ${qualityColors[currentSlide.quality].border}`,
-                backdropFilter: "blur(8px)",
               }}
             >
-              <span style={{ fontSize: "11px" }}>{emoji[currentSlide.quality]}</span>
-              <span style={{ color: qualityColors[currentSlide.quality].color, fontSize: "11px", fontWeight: 600 }}>{currentSlide.qualityText}</span>
+              <span className="text-[11px]">{emoji[currentSlide.quality]}</span>
+              <span className="text-[11px] font-semibold" style={{ color: qualityColors[currentSlide.quality].color }}>{currentSlide.qualityText}</span>
             </div>
 
             {/* Slide slide time */}
             <div
-              className="absolute top-4 left-4 px-2.5 py-1 rounded-full"
-              style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.07)" }}
-            >
-              <span style={{ color: "#64748B", fontSize: "11px", fontFamily: "monospace" }}>{formatTime(slideTimer)} on slide</span>
+              className="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm border border-white/[0.07]">
+              <span className="text-slate-500 text-[11px] font-mono">{formatTime(slideTimer)} on slide</span>
             </div>
 
             {/* Slide content */}
             <div className="px-16 py-12">
               <div
-                className="mb-3 text-xs uppercase tracking-widest"
-                style={{ color: "#3B82F6", letterSpacing: "0.12em" }}
+                className="mb-3 text-xs uppercase tracking-widest text-blue-500"
               >
                 Q1 2026 · Speakprime
               </div>
               <h2
-                style={{
-                  color: "#F8FAFC",
-                  fontSize: "clamp(22px, 3vw, 36px)",
-                  fontWeight: 800,
-                  marginBottom: "28px",
-                  lineHeight: 1.2,
-                }}
-              >
+                className="text-[#F8FAFC] text-[clamp(22px,3vw,36px)] font-extrabold mb-7 leading-[1.2]">
                 {currentSlide.title}
               </h2>
               <ul className="space-y-4">
                 {currentSlide.bullets.map((b, i) => (
                   <li key={i} className="flex items-start gap-3">
                     <div
-                      className="flex-shrink-0 mt-1.5"
-                      style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#3B82F6" }}
+                      className="flex-shrink-0 mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-500"
                     />
-                    <span style={{ color: "#94A3B8", fontSize: "clamp(13px, 1.5vw, 17px)", lineHeight: 1.5 }}>{b}</span>
+                    <span className="text-slate-400 text-[clamp(13px,1.5vw,17px)] leading-[1.5]">{b}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
             {/* Bottom progress bar */}
-            <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: "rgba(255,255,255,0.05)" }}>
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/[0.05]">
               <div
                 className="h-full transition-all duration-500"
                 style={{
@@ -258,26 +218,18 @@ export function LivePresentationPage() {
           <button
             onClick={() => slideIndex > 0 && goSlide(slideIndex - 1)}
             disabled={slideIndex === 0}
-            className="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
-            style={{
-              background: slideIndex === 0 ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.1)",
-              backdropFilter: "blur(8px)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              color: slideIndex === 0 ? "#1e293b" : "#94A3B8",
-            }}
+            className={`absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 backdrop-blur-sm border border-white/10 ${
+              slideIndex === 0 ? "bg-white/[0.03] text-[#1e293b]" : "bg-white/10 text-slate-400"
+            }`}
           >
             <ChevronLeft size={18} />
           </button>
           <button
             onClick={() => slideIndex < mockSlides.length - 1 && goSlide(slideIndex + 1)}
             disabled={slideIndex === mockSlides.length - 1}
-            className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
-            style={{
-              background: slideIndex === mockSlides.length - 1 ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.1)",
-              backdropFilter: "blur(8px)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              color: slideIndex === mockSlides.length - 1 ? "#1e293b" : "#94A3B8",
-            }}
+            className={`absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 backdrop-blur-sm border border-white/10 ${
+              slideIndex === mockSlides.length - 1 ? "bg-white/[0.03] text-[#1e293b]" : "bg-white/10 text-slate-400"
+            }`}
           >
             <ChevronRight size={18} />
           </button>
@@ -286,25 +238,15 @@ export function LivePresentationPage() {
 
       {/* ── USER WEBCAM PIP ── */}
       <div
-        className="absolute z-20 rounded-2xl overflow-hidden"
-        style={{
-          top: "80px",
-          right: showPanel ? "396px" : "16px",
-          width: "188px",
-          height: "140px",
-          border: "2px solid rgba(255,255,255,0.12)",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.7)",
-          background: "#111827",
-          transition: "right 0.3s ease",
-        }}
+        className="absolute z-20 rounded-2xl overflow-hidden top-20 w-[188px] h-[140px] border-2 border-white/[0.12] shadow-[0_8px_32px_rgba(0,0,0,0.7)] bg-[#111827] transition-[right] duration-300 ease-out"
+        style={{ right: showPanel ? "396px" : "16px" }}
       >
         <video
           ref={videoRef}
           autoPlay
           muted
           playsInline
-          className="w-full h-full object-cover"
-          style={{ opacity: cameraOff ? 0 : 1 }}
+          className={`w-full h-full object-cover ${cameraOff ? "opacity-0" : "opacity-100"}`}
         />
         {cameraOff && (
           <div className="absolute inset-0 flex items-center justify-center">
@@ -313,21 +255,20 @@ export function LivePresentationPage() {
         )}
         {/* Eye contact indicator */}
         <div
-          className="absolute bottom-0 left-0 right-0 px-2 py-1.5"
-          style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent)" }}
+          className="absolute bottom-0 left-0 right-0 px-2 py-1.5 bg-gradient-to-t from-black/85 to-transparent"
         >
           <div className="flex items-center gap-1.5">
             <div
               className="w-1.5 h-1.5 rounded-full"
               style={{ background: eyeContact === "good" ? "#22C55E" : "#EF4444" }}
             />
-            <span style={{ color: "white", fontSize: "10px", fontWeight: 600 }}>
+            <span className="text-white text-[10px] font-semibold">
               {eyeContact === "good" ? "Eye contact ✓" : "Look at camera"}
             </span>
           </div>
         </div>
         {muted && (
-          <div className="absolute top-2 right-2 p-1 rounded-full" style={{ background: "rgba(239,68,68,0.9)" }}>
+          <div className="absolute top-2 right-2 p-1 rounded-full bg-[rgba(239,68,68,0.9)]">
             <MicOff size={10} color="white" />
           </div>
         )}
@@ -338,25 +279,22 @@ export function LivePresentationPage() {
         {/* Left */}
         <div className="flex items-center gap-2">
           <div
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-            style={{ background: "rgba(239,68,68,0.92)", backdropFilter: "blur(8px)" }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[rgba(239,68,68,0.92)] backdrop-blur-sm"
           >
-            <div className="w-1.5 h-1.5 rounded-full bg-white" style={{ animation: "pulseDot 1.5s infinite" }} />
-            <span style={{ color: "white", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em" }}>LIVE</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse-dot-fast" />
+            <span className="text-white text-[11px] font-bold tracking-[0.06em]">LIVE</span>
           </div>
           <div
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-            style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.1)" }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/55 backdrop-blur-xl border border-white/10"
           >
-            <span style={{ color: "#F8FAFC", fontSize: "13px", fontWeight: 600, fontFamily: "monospace" }}>{formatTime(timer)}</span>
+            <span className="text-[#F8FAFC] text-[13px] font-semibold font-mono">{formatTime(timer)}</span>
           </div>
           {/* Slide dots */}
           <div
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-            style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.08)" }}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/55 backdrop-blur-xl border border-white/[0.08]"
           >
             <LayoutGrid size={12} color="#64748B" />
-            <span style={{ color: "#94A3B8", fontSize: "12px" }}>
+            <span className="text-slate-400 text-xs">
               Slide {slideIndex + 1} / {mockSlides.length}
             </span>
           </div>
@@ -367,30 +305,27 @@ export function LivePresentationPage() {
           {/* AI speaking */}
           {aiSpeaking && (
             <div
-              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full"
-              style={{ background: "rgba(59,130,246,0.15)", backdropFilter: "blur(8px)", border: "1px solid rgba(59,130,246,0.3)" }}
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/15 backdrop-blur-sm border border-blue-500/30"
             >
               <div className="flex gap-0.5 items-end h-3">
                 {[0, 0.1, 0.2, 0.15, 0.05].map((d, i) => (
                   <div key={i} className="w-0.5 rounded-sm" style={{ height: "100%", background: "#3B82F6", animation: `waveform 0.5s ease ${d}s infinite` }} />
                 ))}
               </div>
-              <span style={{ color: "#3B82F6", fontSize: "12px" }}>AI feedback…</span>
+              <span className="text-blue-500 text-xs">AI feedback…</span>
             </div>
           )}
           {/* Coach toggle */}
           <button
             onClick={() => setShowPanel(!showPanel)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all"
-            style={{
-              background: showPanel ? "rgba(59,130,246,0.35)" : "rgba(0,0,0,0.55)",
-              backdropFilter: "blur(16px)",
-              border: showPanel ? "1px solid rgba(59,130,246,0.5)" : "1px solid rgba(255,255,255,0.1)",
-              color: showPanel ? "#93C5FD" : "#94A3B8",
-            }}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-xl transition-all ${
+              showPanel
+                ? "bg-blue-500/35 border border-blue-500/50 text-blue-300"
+                : "bg-black/55 border border-white/10 text-slate-400"
+            }`}
           >
             <Maximize2 size={13} />
-            <span style={{ fontSize: "12px", fontWeight: 500 }}>Coach</span>
+            <span className="text-[12px] font-medium">Coach</span>
           </button>
         </div>
       </div>
@@ -401,26 +336,16 @@ export function LivePresentationPage() {
         style={{ paddingRight: showPanel ? "380px" : "0", transition: "padding 0.3s ease" }}
       >
         <div
-          className="flex items-center gap-3 px-5 py-3 rounded-full"
-          style={{
-            background: "rgba(10,14,26,0.88)",
-            backdropFilter: "blur(24px)",
-            border: "1px solid rgba(255,255,255,0.09)",
-            boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
-          }}
-        >
+          className="flex items-center gap-3 px-5 py-3 rounded-full bg-[rgba(10,14,26,0.88)] backdrop-blur-2xl border border-white/[0.09] shadow-[0_8px_40px_rgba(0,0,0,0.6)]">
           {/* Slide dots */}
-          <div className="hidden sm:flex items-center gap-1.5 pr-4" style={{ borderRight: "1px solid rgba(255,255,255,0.1)" }}>
+          <div className="hidden sm:flex items-center gap-1.5 pr-4 border-r border-white/10">
             {mockSlides.map((_, i) => (
               <button
                 key={i}
                 onClick={() => goSlide(i)}
-                className="rounded-full transition-all duration-200"
-                style={{
-                  width: i === slideIndex ? "20px" : "6px",
-                  height: "6px",
-                  background: i === slideIndex ? "#3B82F6" : "rgba(255,255,255,0.2)",
-                }}
+                className={`rounded-full transition-all duration-200 h-1.5 ${
+                  i === slideIndex ? "w-5 bg-blue-500" : "w-1.5 bg-white/20"
+                }`}
               />
             ))}
           </div>
@@ -429,8 +354,9 @@ export function LivePresentationPage() {
           <button
             onClick={() => slideIndex > 0 && goSlide(slideIndex - 1)}
             disabled={slideIndex === 0}
-            className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-105"
-            style={{ background: "rgba(255,255,255,0.08)", color: slideIndex === 0 ? "#1e293b" : "#94A3B8" }}
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-105 bg-white/[0.08] ${
+              slideIndex === 0 ? "text-[#1e293b]" : "text-slate-400"
+            }`}
           >
             <ChevronLeft size={17} />
           </button>
@@ -439,41 +365,36 @@ export function LivePresentationPage() {
           <button
             onClick={() => slideIndex < mockSlides.length - 1 && goSlide(slideIndex + 1)}
             disabled={slideIndex === mockSlides.length - 1}
-            className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-105"
-            style={{ background: "rgba(255,255,255,0.08)", color: slideIndex === mockSlides.length - 1 ? "#1e293b" : "#94A3B8" }}
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-105 bg-white/[0.08] ${
+              slideIndex === mockSlides.length - 1 ? "text-[#1e293b]" : "text-slate-400"
+            }`}
           >
             <ChevronRight size={17} />
           </button>
 
           {/* Divider */}
-          <div className="w-px h-6" style={{ background: "rgba(255,255,255,0.1)" }} />
+          <div className="w-px h-6 bg-white/10" />
 
           {/* Mic */}
           <button
             onClick={() => setMuted(!muted)}
-            className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105"
-            style={{ background: muted ? "#EF4444" : "rgba(255,255,255,0.12)" }}
-            title={muted ? "Unmute" : "Mute"}
-          >
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 ${muted ? "bg-red-500" : "bg-white/[0.12]"}`}
+            title={muted ? "Unmute" : "Mute"}>
             {muted ? <MicOff size={19} color="white" /> : <Mic size={19} color="white" />}
           </button>
 
           {/* Camera */}
           <button
             onClick={() => setCameraOff(!cameraOff)}
-            className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105"
-            style={{ background: cameraOff ? "#EF4444" : "rgba(255,255,255,0.12)" }}
-            title={cameraOff ? "Turn camera on" : "Turn camera off"}
-          >
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 ${cameraOff ? "bg-red-500" : "bg-white/[0.12]"}`}
+            title={cameraOff ? "Turn camera on" : "Turn camera off"}>
             {cameraOff ? <VideoOff size={19} color="white" /> : <Video size={19} color="white" />}
           </button>
 
           {/* End */}
           <button
             onClick={() => setShowEndConfirm(true)}
-            className="flex items-center gap-2 px-5 h-12 rounded-full ml-2 transition-all hover:scale-105 hover:bg-red-600"
-            style={{ background: "#EF4444", color: "white", fontSize: "13px", fontWeight: 600 }}
-          >
+            className="flex items-center gap-2 px-5 h-12 rounded-full ml-2 transition-all hover:scale-105 hover:bg-red-600 bg-red-500 text-white text-[13px] font-semibold">
             <PhoneOff size={17} color="white" />
             <span className="hidden sm:inline">End Session</span>
           </button>
@@ -483,77 +404,69 @@ export function LivePresentationPage() {
       {/* ── RIGHT COACH PANEL ── */}
       {showPanel && (
         <div
-          className="coach-panel absolute top-0 right-0 bottom-0 z-30 flex flex-col"
-          style={{
-            width: "380px",
-            background: "rgba(18,18,18,0.97)",
-            backdropFilter: "blur(32px)",
-            borderLeft: "1px solid rgba(255,255,255,0.07)",
-          }}
+          className="coach-panel absolute top-0 right-0 bottom-0 z-30 flex flex-col w-[380px] bg-[rgba(18,18,18,0.97)] backdrop-blur-[32px] border-l border-white/[0.07]"
         >
           {/* Header */}
           <div
-            className="flex items-center justify-between px-5 py-4"
-            style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}
+            className="flex items-center justify-between px-5 py-4 border-b border-white/[0.07]"
           >
             <div>
-              <p style={{ color: "#F8FAFC", fontSize: "14px", fontWeight: 700 }}>Real-Time Coaching</p>
+              <p className="text-[#F8FAFC] text-sm font-bold">Real-Time Coaching</p>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#22C55E", animation: "pulseDot 2s infinite" }} />
-                <span style={{ color: "#22C55E", fontSize: "11px" }}>Live feedback active</span>
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse-dot" />
+                <span className="text-green-500 text-[11px]">Live feedback active</span>
               </div>
             </div>
-            <button onClick={() => setShowPanel(false)} className="p-1 rounded-md" style={{ color: "#475569" }}>
+            <button onClick={() => setShowPanel(false)} className="p-1 rounded-md text-slate-600">
               <X size={16} />
             </button>
           </div>
 
           {/* Eye contact & posture */}
-          <div className="px-5 py-4 space-y-2" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+          <div className="px-5 py-4 space-y-2 border-b border-white/[0.07]">
             <div
-              className="flex items-center gap-2.5 p-3 rounded-xl"
-              style={{
-                background: eyeContact === "bad" ? "rgba(239,68,68,0.08)" : "rgba(34,197,94,0.08)",
-                border: eyeContact === "bad" ? "1px solid rgba(239,68,68,0.2)" : "1px solid rgba(34,197,94,0.2)",
-              }}
+              className={`flex items-center gap-2.5 p-3 rounded-xl ${
+                eyeContact === "bad"
+                  ? "bg-red-500/[0.08] border border-red-500/20"
+                  : "bg-green-500/[0.08] border border-green-500/20"
+              }`}
             >
-              <span style={{ fontSize: "14px" }}>{eyeContact === "bad" ? "🔴" : "🟢"}</span>
-              <span style={{ color: eyeContact === "bad" ? "#EF4444" : "#22C55E", fontSize: "12px" }}>
+              <span className="text-[14px]">{eyeContact === "bad" ? "🔴" : "🟢"}</span>
+              <span className={`text-xs ${eyeContact === "bad" ? "text-red-500" : "text-green-500"}`}>
                 {eyeContact === "bad" ? "Reading from slides — look at camera" : "Good eye contact — keep it up"}
               </span>
             </div>
             <div
-              className="flex items-center gap-2.5 p-3 rounded-xl"
-              style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.2)" }}
+              className="flex items-center gap-2.5 p-3 rounded-xl bg-green-500/[0.08] border border-green-500/20"
             >
-              <span style={{ fontSize: "14px" }}>🟢</span>
-              <span style={{ color: "#22C55E", fontSize: "12px" }}>Good posture detected</span>
+              <span className="text-[14px]">🟢</span>
+              <span className="text-green-500 text-xs">Good posture detected</span>
             </div>
           </div>
 
           {/* Slide overview */}
-          <div className="px-5 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-            <p style={{ color: "#475569", fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>Slides</p>
+          <div className="px-5 py-4 border-b border-white/[0.07]">
+            <p className="text-slate-600 text-[10px] font-bold uppercase tracking-[0.08em] mb-2.5">Slides</p>
             <div className="space-y-1.5">
               {mockSlides.map((s, i) => (
                 <button
                   key={i}
                   onClick={() => goSlide(i)}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all"
-                  style={{
-                    background: i === slideIndex ? "rgba(59,130,246,0.12)" : "transparent",
-                    border: i === slideIndex ? "1px solid rgba(59,130,246,0.25)" : "1px solid transparent",
-                  }}
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all ${
+                    i === slideIndex
+                      ? "bg-blue-500/[0.12] border border-blue-500/25"
+                      : "bg-transparent border border-transparent"
+                  }`}
                 >
                   <div
                     className="w-1.5 h-1.5 rounded-full flex-shrink-0"
                     style={{ background: qualityColors[s.quality].color }}
                   />
-                  <span style={{ color: i === slideIndex ? "#F8FAFC" : "#64748B", fontSize: "12px", flex: 1 }} className="truncate">
+                  <span className={`text-xs flex-1 truncate ${i === slideIndex ? "text-[#F8FAFC]" : "text-slate-500"}`}>
                     {i + 1}. {s.title}
                   </span>
                   {i === slideIndex && (
-                    <span style={{ color: "#3B82F6", fontSize: "10px", fontWeight: 600 }}>CURRENT</span>
+                    <span className="text-blue-500 text-[10px] font-semibold">CURRENT</span>
                   )}
                 </button>
               ))}
@@ -562,11 +475,11 @@ export function LivePresentationPage() {
 
           {/* Feedback feed */}
           <div className="flex-1 overflow-auto px-5 py-4">
-            <p style={{ color: "#475569", fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>
+            <p className="text-slate-600 text-[10px] font-bold uppercase tracking-[0.08em] mb-3">
               Coaching Feed
             </p>
             {feedbackFeed.length === 0 && (
-              <p style={{ color: "#334155", fontSize: "12px" }}>Coaching tips will appear as you present…</p>
+              <p className="text-[#334155] text-xs">Coaching tips will appear as you present…</p>
             )}
             <div className="space-y-2">
               {feedbackFeed.map((f) => (
@@ -579,10 +492,10 @@ export function LivePresentationPage() {
                   }}
                 >
                   <div className="flex items-start gap-2">
-                    <span style={{ color: "#475569", fontSize: "10px", fontFamily: "monospace", whiteSpace: "nowrap", marginTop: "1px" }}>
+                    <span className="text-slate-600 text-[10px] font-mono whitespace-nowrap mt-px">
                       [{f.time}]
                     </span>
-                    <p style={{ color: "#E2E8F0", fontSize: "12px", lineHeight: 1.55 }}>
+                    <p className="text-slate-200 text-xs leading-[1.55]">
                       {emoji[f.type]} {f.text}
                     </p>
                   </div>
@@ -593,13 +506,13 @@ export function LivePresentationPage() {
 
           {/* AI speaking indicator */}
           {aiSpeaking && (
-            <div className="px-5 py-3 flex items-center gap-2" style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+            <div className="px-5 py-3 flex items-center gap-2 border-t border-white/[0.07]">
               <div className="flex gap-0.5 items-end h-4">
                 {[0, 0.1, 0.2, 0.15, 0.05].map((delay, i) => (
                   <div key={i} className="w-1 rounded-sm" style={{ height: "100%", background: "#3B82F6", animation: `waveform 0.6s ease ${delay}s infinite` }} />
                 ))}
               </div>
-              <span style={{ color: "#3B82F6", fontSize: "12px" }}>AI feedback playing…</span>
+              <span className="text-blue-500 text-xs">AI feedback playing…</span>
             </div>
           )}
         </div>
@@ -608,36 +521,29 @@ export function LivePresentationPage() {
       {/* ── END CONFIRM MODAL ── */}
       {showEndConfirm && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center"
-          style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)" }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md"
         >
           <div
-            className="p-8 rounded-3xl w-full max-w-sm"
-            style={{ background: "#0F172A", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 24px 80px rgba(0,0,0,0.6)" }}
+            className="p-8 rounded-3xl w-full max-w-sm bg-[#0F172A] border border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.6)]"
           >
             <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-5"
-              style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)" }}
+              className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-5 bg-red-500/[0.12] border border-red-500/25"
             >
               <PhoneOff size={22} color="#EF4444" />
             </div>
-            <h3 style={{ color: "#F8FAFC", fontSize: "18px", fontWeight: 700, textAlign: "center", marginBottom: "8px" }}>End Presentation?</h3>
-            <p style={{ color: "#64748B", fontSize: "14px", textAlign: "center", marginBottom: "28px", lineHeight: 1.6 }}>
+            <h3 className="text-[#F8FAFC] text-[18px] font-bold text-center mb-2">End Presentation?</h3>
+            <p className="text-slate-500 text-sm text-center mb-7 leading-[1.6]">
               Your presentation will be saved and a full performance report will be generated.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowEndConfirm(false)}
-                className="flex-1 py-3 rounded-2xl transition-opacity hover:opacity-80"
-                style={{ background: "#2a2a2a", border: "1px solid rgba(255,255,255,0.1)", color: "#94A3B8", fontSize: "14px" }}
-              >
+                className="flex-1 py-3 rounded-2xl transition-opacity hover:opacity-80 bg-[#2a2a2a] border border-white/10 text-slate-400 text-sm">
                 Cancel
               </button>
               <button
                 onClick={() => navigate.push("/session/report/2")}
-                className="flex-1 py-3 rounded-2xl transition-opacity hover:opacity-90"
-                style={{ background: "#EF4444", color: "white", fontSize: "14px", fontWeight: 600 }}
-              >
+                className="flex-1 py-3 rounded-2xl transition-opacity hover:opacity-90 bg-red-500 text-white text-sm font-semibold">
                 End & View Report
               </button>
             </div>

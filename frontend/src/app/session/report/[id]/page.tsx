@@ -100,8 +100,8 @@ function CircularProgress({ score }: { score: number }) {
         />
       </svg>
       <div className="absolute text-center">
-        <div style={{ color: "#F8FAFC", fontSize: "32px", fontWeight: 800, lineHeight: 1 }}>{score}</div>
-        <div style={{ color: "#64748B", fontSize: "12px" }}>/ 100</div>
+        <div className="text-[#F8FAFC] text-[32px] font-extrabold leading-none">{score}</div>
+        <div className="text-slate-500 text-xs">/ 100</div>
       </div>
     </div>
   );
@@ -116,8 +116,8 @@ const statusConfig = {
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload?.length) {
     return (
-      <div className="px-3 py-2 rounded-lg" style={{ background: "#222222", border: "1px solid #333333" }}>
-        <p style={{ color: "#3B82F6", fontSize: "14px", fontWeight: 700 }}>{payload[0].value}x</p>
+      <div className="px-3 py-2 rounded-lg bg-[#222222] border border-[#333333]">
+        <p className="text-blue-500 text-sm font-bold">{payload[0].value}x</p>
       </div>
     );
   }
@@ -134,7 +134,7 @@ export default function ReportPage() {
     <DashboardLayout>
       <div className="p-6 lg:p-8 space-y-8 max-w-6xl mx-auto">
         {/* Back */}
-        <Link href="/dashboard" className="flex items-center gap-1.5" style={{ color: "#64748B", fontSize: "14px", textDecoration: "none" }}>
+        <Link href="/dashboard" className="flex items-center gap-1.5 text-slate-500 text-sm no-underline">
           <ChevronLeft size={16} /> Back to Dashboard
         </Link>
 
@@ -142,31 +142,30 @@ export default function ReportPage() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <h1 style={{ color: "#F8FAFC", fontSize: "22px", fontWeight: 800 }}>
+              <h1 className="text-[#F8FAFC] text-[22px] font-extrabold">
                 {isPresentation ? "Q1 Strategy Deck Presentation" : "Google PM Interview Practice"}
               </h1>
-              <span className="px-2.5 py-1 rounded-full flex items-center gap-1.5"
-                style={{ background: isPresentation ? "rgba(139,92,246,0.12)" : "rgba(59,130,246,0.12)", color: isPresentation ? "#8B5CF6" : "#3B82F6", fontSize: "12px", fontWeight: 600 }}>
+              <span className={`px-2.5 py-1 rounded-full flex items-center gap-1.5 text-xs font-semibold ${
+                isPresentation ? "bg-violet-500/[0.12] text-violet-500" : "bg-blue-500/[0.12] text-blue-500"
+              }`}>
                 {isPresentation ? <Monitor size={12} /> : <Mic size={12} />}
                 {isPresentation ? "Presentation" : "Interview"}
               </span>
             </div>
             <div className="flex items-center gap-4">
-              <span className="flex items-center gap-1.5" style={{ color: "#64748B", fontSize: "13px" }}>
+              <span className="flex items-center gap-1.5 text-slate-500 text-[13px]">
                 <Calendar size={13} /> {isPresentation ? "Mar 5, 2026" : "Mar 7, 2026"}
               </span>
-              <span className="flex items-center gap-1.5" style={{ color: "#64748B", fontSize: "13px" }}>
+              <span className="flex items-center gap-1.5 text-slate-500 text-[13px]">
                 <Clock size={13} /> {isPresentation ? "18 min" : "32 min"}
               </span>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg"
-              style={{ background: "#1e1e1e", border: "1px solid #2a2a2a", color: "#94A3B8", fontSize: "14px" }}>
+            <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#1e1e1e] border border-[#2a2a2a] text-slate-400 text-sm">
               <Share2 size={15} /> Share
             </button>
-            <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg"
-              style={{ background: "#1e1e1e", border: "1px solid #2a2a2a", color: "#94A3B8", fontSize: "14px" }}>
+            <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#1e1e1e] border border-[#2a2a2a] text-slate-400 text-sm">
               <Download size={15} /> Download PDF
             </button>
           </div>
@@ -174,16 +173,12 @@ export default function ReportPage() {
 
         {/* Tabs (for presentation mode) */}
         {isPresentation && (
-          <div className="flex gap-1 p-1 rounded-xl w-fit" style={{ background: "#1e1e1e" }}>
+          <div className="flex gap-1 p-1 rounded-xl w-fit bg-[#1e1e1e]">
             {(["overview", "slides"] as const).map((tab) => (
               <button key={tab} onClick={() => setActiveTab(tab)}
-                className="px-5 py-2 rounded-lg capitalize transition-all"
-                style={{
-                  background: activeTab === tab ? "#2a2a2a" : "transparent",
-                  color: activeTab === tab ? "#F8FAFC" : "#64748B",
-                  fontSize: "14px",
-                  fontWeight: activeTab === tab ? 600 : 400,
-                }}>
+                className={`px-5 py-2 rounded-lg capitalize transition-all text-sm ${
+                  activeTab === tab ? "bg-[#2a2a2a] text-[#F8FAFC] font-semibold" : "bg-transparent text-slate-500"
+                }`}>
                 {tab === "slides" ? "Slide Feedback" : "Overview"}
               </button>
             ))}
@@ -195,18 +190,17 @@ export default function ReportPage() {
             {/* Score + Radar */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Overall Score */}
-              <div className="p-8 rounded-2xl flex flex-col items-center"
-                style={{ background: "#1e1e1e", border: "1px solid #2a2a2a" }}>
-                <p style={{ color: "#64748B", fontSize: "13px", marginBottom: "16px" }}>Overall Score</p>
+              <div className="p-8 rounded-2xl flex flex-col items-center bg-[#1e1e1e] border border-[#2a2a2a]">
+                <p className="text-slate-500 text-[13px] mb-4">Overall Score</p>
                 <CircularProgress score={isPresentation ? 74 : 82} />
-                <p className="mt-4" style={{ color: "#64748B", fontSize: "13px" }}>
+                <p className="mt-4 text-slate-500 text-[13px]">
                   {isPresentation ? "Above average" : "Strong performance"}
                 </p>
               </div>
 
               {/* Radar Chart */}
-              <div className="md:col-span-2 p-6 rounded-2xl" style={{ background: "#1e1e1e", border: "1px solid #2a2a2a" }}>
-                <p style={{ color: "#F8FAFC", fontSize: "15px", fontWeight: 700, marginBottom: "12px" }}>Score Breakdown</p>
+              <div className="md:col-span-2 p-6 rounded-2xl bg-[#1e1e1e] border border-[#2a2a2a]">
+                <p className="text-[#F8FAFC] text-[15px] font-bold mb-3">Score Breakdown</p>
                 <ResponsiveContainer width="100%" height={200}>
                   <RadarChart data={radarData}>
                     <PolarGrid stroke="#2a2a2a" />
@@ -223,17 +217,16 @@ export default function ReportPage() {
                 const cfg = statusConfig[m.status as keyof typeof statusConfig];
                 const StatusIcon = cfg.icon;
                 return (
-                  <div key={m.label} className="p-5 rounded-2xl" style={{ background: "#1e1e1e", border: "1px solid #2a2a2a" }}>
+                  <div key={m.label} className="p-5 rounded-2xl bg-[#1e1e1e] border border-[#2a2a2a]">
                     <div className="flex items-center justify-between mb-3">
-                      <span style={{ color: "#94A3B8", fontSize: "13px" }}>{m.label}</span>
+                      <span className="text-slate-400 text-[13px]">{m.label}</span>
                       <StatusIcon size={16} color={cfg.color} />
                     </div>
-                    <div style={{ color: "#F8FAFC", fontSize: "28px", fontWeight: 800, lineHeight: 1 }}>{m.score}</div>
-                    <div style={{ color: "#64748B", fontSize: "11px", marginTop: "2px" }}>/ 100</div>
-                    {m.detail && <div style={{ color: cfg.color, fontSize: "12px", marginTop: "6px", fontWeight: 500 }}>{m.detail}</div>}
-                    <div className="mt-3 h-1.5 rounded-full overflow-hidden" style={{ background: "#141414" }}>
-                      <div className="h-full rounded-full"
-                        style={{ width: `${m.score}%`, background: cfg.color }} />
+                    <div className="text-[#F8FAFC] text-[28px] font-extrabold leading-none">{m.score}</div>
+                    <div className="text-slate-500 text-[11px] mt-0.5">/ 100</div>
+                    {m.detail && <div className="text-[12px] mt-1.5 font-medium" style={{ color: cfg.color }}>{m.detail}</div>}
+                    <div className="mt-3 h-1.5 rounded-full overflow-hidden bg-[#141414]">
+                      <div className="h-full rounded-full" style={{ width: `${m.score}%`, background: cfg.color }} />
                     </div>
                   </div>
                 );
@@ -241,20 +234,20 @@ export default function ReportPage() {
             </div>
 
             {/* Filler Word Breakdown */}
-            <div className="p-6 rounded-2xl" style={{ background: "#1e1e1e", border: "1px solid #2a2a2a" }}>
-              <h3 style={{ color: "#F8FAFC", fontSize: "16px", fontWeight: 700, marginBottom: "16px" }}>
+            <div className="p-6 rounded-2xl bg-[#1e1e1e] border border-[#2a2a2a]">
+              <h3 className="text-[#F8FAFC] text-base font-bold mb-4">
                 Filler Word Breakdown
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   {fillerData.map((f) => (
                     <div key={f.word} className="flex items-center gap-3 mb-3">
-                      <span style={{ color: "#94A3B8", fontSize: "14px", width: "80px" }}>"{f.word}"</span>
-                      <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: "#141414" }}>
-                        <div className="h-full rounded-full"
-                          style={{ width: `${(f.count / 6) * 100}%`, background: "#F59E0B" }} />
+                      <span className="text-slate-400 text-sm w-20">"{f.word}"</span>
+                      <div className="flex-1 h-2 rounded-full overflow-hidden bg-[#141414]">
+                        <div className="h-full rounded-full bg-amber-500"
+                          style={{ width: `${(f.count / 6) * 100}%` }} />
                       </div>
-                      <span style={{ color: "#F59E0B", fontSize: "13px", fontWeight: 600, width: "60px" }}>{f.count}x</span>
+                      <span className="text-amber-500 text-[13px] font-semibold w-[60px]">{f.count}x</span>
                     </div>
                   ))}
                 </div>
@@ -274,23 +267,23 @@ export default function ReportPage() {
             </div>
 
             {/* Transcript */}
-            <div className="p-6 rounded-2xl" style={{ background: "#1e1e1e", border: "1px solid #2a2a2a" }}>
-              <h3 style={{ color: "#F8FAFC", fontSize: "16px", fontWeight: 700, marginBottom: "6px" }}>Annotated Transcript</h3>
+            <div className="p-6 rounded-2xl bg-[#1e1e1e] border border-[#2a2a2a]">
+              <h3 className="text-[#F8FAFC] text-base font-bold mb-1.5">Annotated Transcript</h3>
               <div className="flex items-center gap-4 mb-5">
                 {[
                   { color: "#F59E0B", bg: "rgba(245,158,11,0.2)", label: "Filler words" },
                   { color: "#EF4444", bg: "rgba(239,68,68,0.15)", label: "Low confidence" },
                   { color: "#3B82F6", bg: "rgba(59,130,246,0.2)", label: "STAR structure" },
                 ].map((legend) => (
-                  <div key={legend.label} className="flex items-center gap-1.5">
-                    <div className="w-3 h-3 rounded-sm" style={{ background: legend.bg, border: `1px solid ${legend.color}` }} />
-                    <span style={{ color: "#64748B", fontSize: "12px" }}>{legend.label}</span>
-                  </div>
+                    <div key={legend.label} className="flex items-center gap-1.5">
+                      <div className="w-3 h-3 rounded-sm" style={{ background: legend.bg, border: `1px solid ${legend.color}` }} />
+                      <span className="text-slate-500 text-xs">{legend.label}</span>
+                    </div>
                 ))}
               </div>
               <div className="space-y-4">
                 {transcriptParagraphs.map((para, i) => (
-                  <p key={i} style={{ color: "#94A3B8", fontSize: "14px", lineHeight: 1.8 }}>
+                  <p key={i} className="text-slate-400 text-sm leading-[1.8]">
                     {para.parts.map((part, j) => {
                       if (part.type === "filler") {
                         return <mark key={j} style={{ background: "rgba(245,158,11,0.25)", color: "#F59E0B", borderRadius: "3px", padding: "1px 3px" }}>{part.text}</mark>;
@@ -307,30 +300,28 @@ export default function ReportPage() {
 
             {/* AI Recommendations */}
             <div>
-              <h3 style={{ color: "#F8FAFC", fontSize: "16px", fontWeight: 700, marginBottom: "16px" }}>AI Recommendations</h3>
+              <h3 className="text-[#F8FAFC] text-base font-bold mb-4">AI Recommendations</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
                   "Replace 'um' with a 2-second pause. Practice the pause deliberately — it signals confidence.",
                   "Your answer to Q2 lacked the Result component of STAR. Always close with a measurable outcome.",
                   "Your speaking pace was 178 WPM — ideal is 130–150. Try recording yourself at a slower pace.",
                 ].map((tip, i) => (
-                  <div key={i} className="p-5 rounded-2xl"
-                    style={{ background: "rgba(59,130,246,0.05)", border: "1px solid rgba(59,130,246,0.2)" }}>
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-3"
-                      style={{ background: "rgba(59,130,246,0.15)" }}>
-                      <Lightbulb size={16} color="#3B82F6" />
+                  <div key={i} className="p-5 rounded-2xl bg-blue-500/[0.05] border border-blue-500/20">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-3 bg-blue-500/15">
+                      <Lightbulb size={16} className="text-blue-500" />
                     </div>
-                    <p style={{ color: "#94A3B8", fontSize: "14px", lineHeight: 1.7 }}>{tip}</p>
+                    <p className="text-slate-400 text-sm leading-[1.7]">{tip}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Session Replay Timeline */}
-            <div className="p-6 rounded-2xl" style={{ background: "#1e1e1e", border: "1px solid #2a2a2a" }}>
-              <h3 style={{ color: "#F8FAFC", fontSize: "16px", fontWeight: 700, marginBottom: "16px" }}>Session Replay Timeline</h3>
+            <div className="p-6 rounded-2xl bg-[#1e1e1e] border border-[#2a2a2a]">
+              <h3 className="text-[#F8FAFC] text-base font-bold mb-4">Session Replay Timeline</h3>
               <div className="relative h-8">
-                <div className="absolute inset-0 rounded-full" style={{ background: "#141414" }} />
+                <div className="absolute inset-0 rounded-full bg-[#141414]" />
                 {/* Markers */}
                 {[
                   { pos: 15, type: "red" },
@@ -344,8 +335,7 @@ export default function ReportPage() {
                     style={{ left: `${marker.pos}%` }}>
                     <div className="w-3 h-3 rounded-full border-2 border-white"
                       style={{ background: marker.type === "red" ? "#EF4444" : marker.type === "yellow" ? "#F59E0B" : "#22C55E" }} />
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity"
-                      style={{ background: "#333333", color: "#F8FAFC", fontSize: "11px" }}>
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity bg-[#333333] text-[#F8FAFC] text-[11px]">
                       {marker.pos * 19.2 / 100 < 1 ? `0:${Math.floor(marker.pos * 19.2 / 10)}` : `${Math.floor(marker.pos * 19.2 / 60)}:${String(Math.floor((marker.pos * 19.2) % 60)).padStart(2, "0")}`} — feedback
                     </div>
                   </div>
@@ -355,8 +345,8 @@ export default function ReportPage() {
                   style={{ width: "65%", background: "linear-gradient(90deg, rgba(59,130,246,0.3), rgba(139,92,246,0.3))" }} />
               </div>
               <div className="flex justify-between mt-2">
-                <span style={{ color: "#64748B", fontSize: "11px" }}>0:00</span>
-                <span style={{ color: "#64748B", fontSize: "11px" }}>{isPresentation ? "18:00" : "32:00"}</span>
+                <span className="text-slate-500 text-[11px]">0:00</span>
+                <span className="text-slate-500 text-[11px]">{isPresentation ? "18:00" : "32:00"}</span>
               </div>
             </div>
           </>
@@ -365,27 +355,25 @@ export default function ReportPage() {
         {/* Slide Feedback Tab */}
         {activeTab === "slides" && isPresentation && (
           <div>
-            <h3 style={{ color: "#F8FAFC", fontSize: "16px", fontWeight: 700, marginBottom: "16px" }}>Slide-by-Slide Feedback</h3>
+            <h3 className="text-[#F8FAFC] text-base font-bold mb-4">Slide-by-Slide Feedback</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {slideThumb.map((slide, i) => {
                 const cfg = statusConfig[slide.status as keyof typeof statusConfig];
                 return (
-                  <div key={i} className="p-4 rounded-2xl cursor-pointer transition-all hover:-translate-y-1"
-                    style={{ background: "#1e1e1e", border: `1px solid ${cfg.color}30` }}>
-                    {/* Slide preview */}
-                    <div className="rounded-lg p-3 mb-3" style={{ background: "#141414", aspectRatio: "16/9", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div key={i} className="p-4 rounded-2xl cursor-pointer transition-all hover:-translate-y-1 bg-[#1e1e1e]" style={{ border: `1px solid ${cfg.color}30` }}>
+                    <div className="rounded-lg p-3 mb-3 bg-[#141414] aspect-video flex items-center justify-center">
                       <div className="text-center">
-                        <div style={{ color: "#334155", fontSize: "10px", marginBottom: "4px" }}>Slide {i + 1}</div>
-                        <div style={{ color: "#64748B", fontSize: "11px", fontWeight: 600 }}>{slide.title}</div>
+                        <div className="text-[#334155] text-[10px] mb-1">Slide {i + 1}</div>
+                        <div className="text-slate-500 text-[11px] font-semibold">{slide.title}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 mb-2">
                       <cfg.icon size={14} color={cfg.color} />
-                      <span style={{ color: cfg.color, fontSize: "12px", fontWeight: 600 }}>
+                      <span className="text-[12px] font-semibold" style={{ color: cfg.color }}>
                         {slide.status === "green" ? "Good" : slide.status === "yellow" ? "Needs Work" : "Revise"}
                       </span>
                     </div>
-                    <p style={{ color: "#64748B", fontSize: "12px", lineHeight: 1.5 }}>{slide.feedback}</p>
+                    <p className="text-slate-500 text-xs leading-[1.5]">{slide.feedback}</p>
                   </div>
                 );
               })}
