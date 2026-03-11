@@ -169,8 +169,8 @@ export default function Home() {
                   <div className="text-center text-[#64748B] text-xs leading-6">app.speakprime.ai/session/live</div>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-0 min-h-[300px]">
-                <div className="p-6 border-r border-[#2a2a2a]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-0 min-h-[300px]">
+                <div className="p-6 border-b sm:border-b-0 sm:border-r border-[#2a2a2a]">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-2 h-2 rounded-full bg-red-500" />
                     <span className="text-red-500 text-[11px] font-semibold">● LIVE</span>

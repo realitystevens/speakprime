@@ -90,7 +90,7 @@ export default function SessionSetupPage() {
               }`}>
                 {step > s ? <CheckCircle size={16} /> : s}
               </div>
-              <span className={`text-[13px] ${step === s ? "text-[#F8FAFC] font-semibold" : "text-slate-500"}`}>
+              <span className={`hidden sm:inline text-[13px] ${step === s ? "text-[#F8FAFC] font-semibold" : "text-slate-500"}`}>
                 {s === 1 ? "Choose Mode" : s === 2 ? "Configure" : "Camera & Mic"}
               </span>
               {s < 3 && <div className={`w-8 h-px ${step > s ? "bg-blue-500" : "bg-[#2a2a2a]"}`} />}

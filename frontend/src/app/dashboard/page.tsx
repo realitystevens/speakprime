@@ -58,7 +58,7 @@ export default function DashboardPage() {
     <DashboardLayout>
       <div className="p-6 lg:p-8 space-y-8">
         {/* Top bar */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-y-3">
           <div>
             <h1 className="text-slate-50 text-2xl font-extrabold">Good morning, David \ud83d\udc4b</h1>
             <p className="text-slate-500 text-sm mt-1">Monday, March 9, 2026 \u2014 Ready to practice?</p>

@@ -142,7 +142,7 @@ export default function LiveInterviewPage() {
     >
 
       {/* ── MAIN STAGE: AI Interviewer ── */}
-      <div className="absolute inset-0 flex items-center justify-center" style={{ paddingRight: showPanel ? "380px" : "0", transition: "padding 0.3s ease" }}>
+      <div className={`absolute inset-0 flex items-center justify-center transition-[padding] duration-300 ${showPanel ? "sm:pr-[380px]" : ""}`}>
         {/* Ambient background radial */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_45%,rgba(59,130,246,0.03)_0%,transparent_70%)]" />
 
@@ -207,8 +207,7 @@ export default function LiveInterviewPage() {
 
       {/* ── USER WEBCAM PIP ── */}
       <div
-        className="absolute z-20 rounded-2xl overflow-hidden bottom-[90px] w-[200px] h-[148px] border-2 border-white/[0.12] shadow-[0_8px_32px_rgba(0,0,0,0.7)] bg-[#111827] transition-[right] duration-300 ease-out"
-        style={{ right: showPanel ? "396px" : "16px" }}
+        className={`absolute z-20 rounded-2xl overflow-hidden bottom-[90px] w-[200px] h-[148px] border-2 border-white/[0.12] shadow-[0_8px_32px_rgba(0,0,0,0.7)] bg-[#111827] transition-[right] duration-300 ease-out right-4 ${showPanel ? "sm:right-[396px]" : ""}`}
       >
         <video
           ref={videoRef}
@@ -306,7 +305,7 @@ export default function LiveInterviewPage() {
       </div>
 
       {/* ── BOTTOM CONTROL BAR ── */}
-      <div className="absolute bottom-5 left-0 right-0 flex items-center justify-center z-20" style={{ paddingRight: showPanel ? "380px" : "0", transition: "padding 0.3s ease" }}>
+      <div className={`absolute bottom-5 left-0 right-0 flex items-center justify-center z-20 transition-[padding] duration-300 ${showPanel ? "sm:pr-[380px]" : ""}`}>
         <div
           className="flex items-center gap-3 px-5 py-3 rounded-full bg-[rgba(10,14,26,0.88)] backdrop-blur-2xl border border-white/[0.09] shadow-[0_8px_40px_rgba(0,0,0,0.7)]">
           {/* Progress */}
@@ -358,7 +357,7 @@ export default function LiveInterviewPage() {
       {/* ── RIGHT COACH PANEL ── */}
       {showPanel && (
         <div
-          className="coach-panel absolute top-0 right-0 bottom-0 z-30 flex flex-col w-[380px] bg-[rgba(22,22,22,0.97)] backdrop-blur-[32px] border-l border-white/[0.07]"
+          className="coach-panel fixed inset-0 sm:absolute sm:inset-auto sm:top-0 sm:right-0 sm:bottom-0 z-30 flex flex-col w-full sm:w-[380px] bg-[rgba(22,22,22,0.97)] backdrop-blur-[32px] border-l border-white/[0.07]"
         >
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.07]">

@@ -72,7 +72,7 @@ export default function SettingsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 max-w-5xl">
           {/* Sidebar Nav */}
           <div className="lg:col-span-1">
-            <nav className="space-y-1 sticky top-6">
+            <nav className="space-y-1 lg:sticky lg:top-6">
               {sections.map((section) => (
                 <a
                   key={section.id}
