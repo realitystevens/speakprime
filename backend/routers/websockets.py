@@ -1,8 +1,8 @@
 """
 WebSocket endpoints for live coaching sessions.
 
-WS /ws/interview/{session_id}?token=<firebase_token>
-WS /ws/presentation/{session_id}?token=<firebase_token>
+WS /ws/interview/{session_id}
+WS /ws/presentation/{session_id}
 """
 
 import asyncio
@@ -10,7 +10,6 @@ import base64
 import json
 import logging
 import time
-from typing import Optional
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from google.genai import types
@@ -21,7 +20,7 @@ from agents.presentation_agent import (
     analyze_slide,
     get_presentation_config,
 )
-from core.dependencies import verify_websocket_token
+from core.dependencies import get_websocket_user
 from core.gemini import LIVE_MODEL, get_genai_client
 from models.session import FeedbackEvent, SessionConfig, TranscriptEntry
 from services.firestore import firestore_service
@@ -94,7 +93,6 @@ async def _save_feedback(
 async def interview_websocket(
     websocket: WebSocket,
     session_id: str,
-    token: Optional[str] = None,
 ):
     """
     Full-duplex WebSocket for live interview coaching sessions.
@@ -109,27 +107,12 @@ async def interview_websocket(
     """
     await websocket.accept()
 
-    # Authenticate
-    if not token:
-        await websocket.send_json({"type": "error", "message": "Missing authentication token."})
-        await websocket.close(code=1008)
-        return
-
-    try:
-        uid = await verify_websocket_token(token)
-    except ValueError:
-        await websocket.send_json({"type": "error", "message": "Invalid authentication token."})
-        await websocket.close(code=1008)
-        return
+    uid = get_websocket_user(websocket)
 
     # Load session
     session_data = await firestore_service.get_session(session_id)
     if session_data is None:
         await websocket.send_json({"type": "error", "message": "Session not found."})
-        await websocket.close(code=1008)
-        return
-    if session_data.get("user_id") != uid:
-        await websocket.send_json({"type": "error", "message": "Access denied."})
         await websocket.close(code=1008)
         return
 
@@ -324,7 +307,6 @@ async def interview_websocket(
 async def presentation_websocket(
     websocket: WebSocket,
     session_id: str,
-    token: Optional[str] = None,
 ):
     """
     Full-duplex WebSocket for live presentation coaching sessions.
@@ -347,27 +329,12 @@ async def presentation_websocket(
     """
     await websocket.accept()
 
-    # Authenticate
-    if not token:
-        await websocket.send_json({"type": "error", "message": "Missing authentication token."})
-        await websocket.close(code=1008)
-        return
-
-    try:
-        uid = await verify_websocket_token(token)
-    except ValueError:
-        await websocket.send_json({"type": "error", "message": "Invalid authentication token."})
-        await websocket.close(code=1008)
-        return
+    uid = get_websocket_user(websocket)
 
     # Load session
     session_data = await firestore_service.get_session(session_id)
     if session_data is None:
         await websocket.send_json({"type": "error", "message": "Session not found."})
-        await websocket.close(code=1008)
-        return
-    if session_data.get("user_id") != uid:
-        await websocket.send_json({"type": "error", "message": "Access denied."})
         await websocket.close(code=1008)
         return
 

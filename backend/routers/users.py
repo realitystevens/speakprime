@@ -4,7 +4,6 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from core.dependencies import get_current_user
-from core.firebase import get_auth
 from models.user import UpdateProfileRequest, UserProfile
 from services.firestore import firestore_service
 from services.storage import storage_service
@@ -22,7 +21,7 @@ def _normalize_user(user_data: dict) -> dict:
 
 @router.get("/me", summary="Get full user profile")
 async def get_my_profile(uid: Annotated[str, Depends(get_current_user)]):
-    """Return the authenticated user's full profile from Firestore."""
+    """Return the demo user's full profile from Firestore."""
     user_data = await firestore_service.get_user(uid)
     if user_data is None:
         raise HTTPException(
@@ -37,7 +36,7 @@ async def update_my_profile(
     body: UpdateProfileRequest,
     uid: Annotated[str, Depends(get_current_user)],
 ):
-    """Update the authenticated user's profile fields."""
+    """Update the demo user's profile fields."""
     update_fields = body.model_dump(exclude_none=True)
 
     if "coaching_preferences" in update_fields and isinstance(
@@ -79,7 +78,7 @@ async def get_my_stats(uid: Annotated[str, Depends(get_current_user)]):
 @router.delete("/me", summary="Delete user account and all associated data")
 async def delete_my_account(uid: Annotated[str, Depends(get_current_user)]):
     """
-    Permanently delete the authenticated user's account, all sessions,
+    Permanently delete the demo user's account, all sessions,
     reports, and GCS files.
     """
     try:
@@ -93,15 +92,6 @@ async def delete_my_account(uid: Annotated[str, Depends(get_current_user)]):
 
         # Delete Firestore data
         await firestore_service.delete_all_user_data(uid)
-
-        # Revoke Firebase auth tokens and delete the auth user
-        firebase_auth = get_auth()
-        try:
-            firebase_auth.revoke_refresh_tokens(uid)
-            firebase_auth.delete_user(uid)
-        except Exception as e:
-            logger.warning(
-                f"Firebase auth deletion warning for uid={uid}: {e}")
 
         logger.info(f"Account deleted for uid={uid}")
     except Exception as e:

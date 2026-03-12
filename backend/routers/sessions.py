@@ -85,7 +85,6 @@ async def _run_report_generation(
             f"Background report generation failed for session {session_id}: {e}")
 
 
-
 # Endpoints
 
 @router.post("", status_code=status.HTTP_201_CREATED, summary="Create a new session")
@@ -139,16 +138,12 @@ async def list_sessions(
 @router.get("/{session_id}", summary="Get a single session")
 async def get_session(
     session_id: str,
-    uid: Annotated[str, Depends(get_current_user)],
 ):
-    """Return a single session by id. Verifies ownership."""
+    """Return a single session by id."""
     session_data = await firestore_service.get_session(session_id)
     if session_data is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Session not found.")
-    if session_data.get("user_id") != uid:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Access denied.")
     return Session(**_normalize_session(session_data)).model_dump(mode="json")
 
 
@@ -156,16 +151,12 @@ async def get_session(
 async def update_session(
     session_id: str,
     body: UpdateSessionRequest,
-    uid: Annotated[str, Depends(get_current_user)],
 ):
     """Update mutable fields on a session (name, status)."""
     session_data = await firestore_service.get_session(session_id)
     if session_data is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Session not found.")
-    if session_data.get("user_id") != uid:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Access denied.")
 
     update_fields = body.model_dump(exclude_none=True)
     if not update_fields:
@@ -185,16 +176,12 @@ async def update_session(
 @router.delete("/{session_id}", summary="Delete a session")
 async def delete_session(
     session_id: str,
-    uid: Annotated[str, Depends(get_current_user)],
 ):
     """Delete a session along with its transcript, feedback, and GCS files."""
     session_data = await firestore_service.get_session(session_id)
     if session_data is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Session not found.")
-    if session_data.get("user_id") != uid:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Access denied.")
 
     try:
         await firestore_service.delete_session(session_id)
@@ -210,7 +197,6 @@ async def delete_session(
 @router.post("/{session_id}/upload-slides", summary="Upload slide file for a session")
 async def upload_slides(
     session_id: str,
-    uid: Annotated[str, Depends(get_current_user)],
     file: UploadFile = File(...),
 ):
     """
@@ -221,9 +207,6 @@ async def upload_slides(
     if session_data is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Session not found.")
-    if session_data.get("user_id") != uid:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Access denied.")
 
     content_type = file.content_type or ""
     filename = file.filename or "slides.pdf"
@@ -262,8 +245,8 @@ async def upload_slides(
 @router.post("/{session_id}/end", summary="End a session and trigger report generation")
 async def end_session(
     session_id: str,
-    uid: Annotated[str, Depends(get_current_user)],
     background_tasks: BackgroundTasks,
+    uid: Annotated[str, Depends(get_current_user)],
 ):
     """
     Mark the session as completed and kick off background report generation.
@@ -273,9 +256,6 @@ async def end_session(
     if session_data is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Session not found.")
-    if session_data.get("user_id") != uid:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Access denied.")
 
     now = datetime.now(timezone.utc)
     started_at_raw = session_data.get("started_at")
@@ -322,16 +302,12 @@ async def end_session(
 @router.get("/{session_id}/transcript", summary="Get the transcript for a session")
 async def get_transcript(
     session_id: str,
-    uid: Annotated[str, Depends(get_current_user)],
 ):
     """Return all transcript entries for a session, ordered by timestamp."""
     session_data = await firestore_service.get_session(session_id)
     if session_data is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Session not found.")
-    if session_data.get("user_id") != uid:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Access denied.")
 
     entries = await firestore_service.get_session_transcript(session_id)
     return [TranscriptEntry(**e).model_dump(mode="json") for e in entries]
@@ -340,16 +316,12 @@ async def get_transcript(
 @router.get("/{session_id}/feedback", summary="Get feedback events for a session")
 async def get_feedback(
     session_id: str,
-    uid: Annotated[str, Depends(get_current_user)],
 ):
     """Return all feedback events for a session, ordered by timestamp."""
     session_data = await firestore_service.get_session(session_id)
     if session_data is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Session not found.")
-    if session_data.get("user_id") != uid:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Access denied.")
 
     events = await firestore_service.get_session_feedback(session_id)
     return [FeedbackEvent(**e).model_dump(mode="json") for e in events]
@@ -358,16 +330,12 @@ async def get_feedback(
 @router.get("/{session_id}/report", summary="Get the report for a session")
 async def get_session_report(
     session_id: str,
-    uid: Annotated[str, Depends(get_current_user)],
 ):
     """Return the report for a session. Returns 404 if not yet generated."""
     session_data = await firestore_service.get_session(session_id)
     if session_data is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Session not found.")
-    if session_data.get("user_id") != uid:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Access denied.")
 
     report_data = await firestore_service.get_session_report(session_id)
     if report_data is None:

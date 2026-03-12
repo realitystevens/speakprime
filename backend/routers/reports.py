@@ -26,14 +26,11 @@ async def get_report(
     report_id: str,
     uid: Annotated[str, Depends(get_current_user)],
 ):
-    """Return a full coaching report. Verifies the report belongs to the current user."""
+    """Return a full coaching report."""
     report_data = await firestore_service.get_report(report_id)
     if report_data is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Report not found.")
-    if report_data.get("user_id") != uid:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Access denied.")
 
     _fix_report_datetimes(report_data)
     return Report(**report_data).model_dump(mode="json")
@@ -52,9 +49,6 @@ async def generate_report_pdf(
     if report_data is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Report not found.")
-    if report_data.get("user_id") != uid:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Access denied.")
 
     _fix_report_datetimes(report_data)
     report = Report(**report_data)
@@ -84,9 +78,6 @@ async def download_report_pdf(
     if report_data is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Report not found.")
-    if report_data.get("user_id") != uid:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Access denied.")
 
     pdf_url = report_data.get("pdf_url")
     if not pdf_url:
