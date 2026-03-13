@@ -185,8 +185,18 @@ export const sessionApi = {
   create: (body: CreateSessionBody) => api.post<Session>("/sessions", body),
   end: (id: string) =>
     api.post<{ session_id: string; report_id: string }>(`/sessions/${id}/end`),
-  delete: (id: string) =>
-    api.delete<{ success: boolean }>(`/sessions/${id}`),
+  delete: async (id: string) => {
+    try {
+      return await api.delete<{ success: boolean }>(`/sessions/${id}`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      // Treat "already deleted" as success to keep delete idempotent in the UI.
+      if (message.includes("API 404")) {
+        return { success: true };
+      }
+      throw err;
+    }
+  },
   uploadSlides: (sessionId: string, file: File) => {
     const form = new FormData();
     form.append("file", file);
