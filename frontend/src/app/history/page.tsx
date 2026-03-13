@@ -25,6 +25,8 @@ export default function HistoryPage() {
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
 
   useEffect(() => {
     sessionApi.list({ limit: 100, mode: filter !== "all" ? filter : undefined })
@@ -40,6 +42,18 @@ export default function HistoryPage() {
     s.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  useEffect(() => {
+    // Keep selection in sync with visible data after refresh/filtering.
+    setSelectedIds((prev) => {
+      const validIds = new Set(sessions.map((s) => s.id));
+      const next = new Set<string>();
+      for (const id of prev) {
+        if (validIds.has(id)) next.add(id);
+      }
+      return next;
+    });
+  }, [sessions]);
+
   const deleteSession = async (id: string) => {
     try {
       await sessionApi.delete(id);
@@ -54,6 +68,60 @@ export default function HistoryPage() {
     if (!pendingDeleteId) return;
     await deleteSession(pendingDeleteId);
     setPendingDeleteId(null);
+  };
+
+  const toggleSelected = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const visibleIds = filtered.map((s) => s.id);
+  const allVisibleSelected =
+    visibleIds.length > 0 && visibleIds.every((id) => selectedIds.has(id));
+
+  const toggleSelectAllVisible = () => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (allVisibleSelected) {
+        visibleIds.forEach((id) => next.delete(id));
+      } else {
+        visibleIds.forEach((id) => next.add(id));
+      }
+      return next;
+    });
+  };
+
+  const deleteSelectedSessions = async () => {
+    const idsToDelete = Array.from(selectedIds);
+    if (idsToDelete.length === 0) {
+      setShowBulkDeleteConfirm(false);
+      return;
+    }
+
+    const results = await Promise.allSettled(idsToDelete.map((id) => sessionApi.delete(id)));
+    const succeededIds = idsToDelete.filter((_, i) => results[i].status === "fulfilled");
+
+    if (succeededIds.length > 0) {
+      const succeededSet = new Set(succeededIds);
+      setSessions((prev) => prev.filter((s) => !succeededSet.has(s.id)));
+      setTotal((t) => Math.max(0, t - succeededIds.length));
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        succeededIds.forEach((id) => next.delete(id));
+        return next;
+      });
+    }
+
+    const failedCount = results.length - succeededIds.length;
+    if (failedCount > 0) {
+      console.error(`Failed to delete ${failedCount} session(s).`);
+    }
+
+    setShowBulkDeleteConfirm(false);
   };
 
   return (
@@ -91,6 +159,30 @@ export default function HistoryPage() {
           </div>
         </div>
 
+        {!loading && filtered.length > 0 && (
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-xl bg-[#1e1e1e] border border-[#2a2a2a]">
+            <label className="inline-flex items-center gap-2 text-slate-400 text-sm">
+              <input
+                type="checkbox"
+                checked={allVisibleSelected}
+                onChange={toggleSelectAllVisible}
+                className="h-4 w-4 rounded border-[#334155] bg-[#111111] text-blue-500"
+              />
+              Select all visible
+            </label>
+            <span className="text-slate-500 text-sm sm:ml-auto">
+              {selectedIds.size} selected
+            </span>
+            <button
+              onClick={() => setShowBulkDeleteConfirm(true)}
+              disabled={selectedIds.size === 0}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Trash2 size={14} /> Delete Selected
+            </button>
+          </div>
+        )}
+
         {/* Session Cards */}
         {loading ? (
           <div className="space-y-3">
@@ -116,11 +208,20 @@ export default function HistoryPage() {
               <div key={session.id}
                 className="flex flex-col sm:flex-row sm:items-center gap-4 p-5 rounded-2xl bg-[#1e1e1e] border border-[#2a2a2a]">
                 {/* Icon */}
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${session.mode === "interview" ? "bg-blue-500/[12%]" : "bg-violet-500/[12%]"
-                  }`}>
-                  {session.mode === "interview"
-                    ? <Mic size={22} color="#3B82F6" />
-                    : <Monitor size={22} color="#8B5CF6" />}
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(session.id)}
+                    onChange={() => toggleSelected(session.id)}
+                    className="h-4 w-4 rounded border-[#334155] bg-[#111111] text-blue-500"
+                    aria-label={`Select ${session.name}`}
+                  />
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${session.mode === "interview" ? "bg-blue-500/[12%]" : "bg-violet-500/[12%]"
+                    }`}>
+                    {session.mode === "interview"
+                      ? <Mic size={22} color="#3B82F6" />
+                      : <Monitor size={22} color="#8B5CF6" />}
+                  </div>
                 </div>
 
                 {/* Info */}
@@ -179,6 +280,16 @@ export default function HistoryPage() {
         confirmText="Delete"
         onClose={() => setPendingDeleteId(null)}
         onConfirm={confirmDeleteSession}
+        icon={<Trash2 size={22} color="#EF4444" />}
+      />
+
+      <ConfirmDialog
+        open={showBulkDeleteConfirm}
+        title={`Delete ${selectedIds.size} selected session${selectedIds.size === 1 ? "" : "s"}?`}
+        description="This will permanently remove the selected sessions and their associated data."
+        confirmText="Delete Selected"
+        onClose={() => setShowBulkDeleteConfirm(false)}
+        onConfirm={deleteSelectedSessions}
         icon={<Trash2 size={22} color="#EF4444" />}
       />
     </DashboardLayout>
