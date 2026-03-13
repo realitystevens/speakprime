@@ -37,8 +37,3 @@ venv/
 .vscode/
 
 service-account.json
-
-
-gsutil mb -p canvas-syntax-489713-b2 gs://speakprime-sessions
-gcloud pubsub topics create speakprime-feedback --project=canvas-syntax-489713-b2
-gcloud pubsub topics create speakprime-sessions --project=canvas-syntax-489713-b2

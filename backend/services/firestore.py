@@ -47,12 +47,12 @@ class FirestoreService:
             raise
 
     async def update_user(self, uid: str, data: dict) -> dict:
-        """Update fields on a user document. Returns the merged data."""
+        """Update fields on a user document (upsert). Returns the merged data."""
 
         def _run():
             db = get_db()
             doc_ref = db.collection("users").document(uid)
-            doc_ref.update(data)
+            doc_ref.set(data, merge=True)
             updated = doc_ref.get()
             return updated.to_dict()
 
@@ -116,15 +116,24 @@ class FirestoreService:
 
         def _run():
             db = get_db()
-            query = (
-                db.collection("sessions")
-                .where("user_id", "==", uid)
-                .order_by("created_at", direction="DESCENDING")
-            )
+            # Start with base query
+            query = db.collection("sessions").where("user_id", "==", uid)
+
             if mode:
                 query = query.where("mode", "==", mode)
+
             docs = query.stream()
             results = [doc.to_dict() for doc in docs]
+
+            # Sort in memory to avoid needing composite indexes during dev
+            def _sort_key(s):
+                val = s.get("created_at")
+                # Handle both datetime objects and ISO strings
+                if hasattr(val, "isoformat"):
+                    return val.isoformat()
+                return str(val or "")
+
+            results.sort(key=_sort_key, reverse=True)
             return results[offset: offset + limit]
 
         try:
@@ -372,21 +381,45 @@ class FirestoreService:
             from datetime import datetime, timezone
 
             now = datetime.now(timezone.utc)
+
+            def _ensure_datetime(val):
+                if isinstance(val, datetime):
+                    return val
+                if isinstance(val, str):
+                    try:
+                        return datetime.fromisoformat(val.replace("Z", "+00:00"))
+                    except ValueError:
+                        return None
+                return None
+
+            def _month_str(val) -> str:
+                dt = _ensure_datetime(val)
+                if dt:
+                    return dt.strftime("%Y-%m")
+                return ""
+
             sessions_this_month = sum(
                 1
                 for s in sessions
-                if s.get("created_at", "")[:7] == now.strftime("%Y-%m")
+                if _month_str(s.get("created_at")) == now.strftime("%Y-%m")
             )
 
             # Confidence over time (most recent 10)
+            def _date_str(val) -> str:
+                dt = _ensure_datetime(val)
+                if dt:
+                    return dt.strftime("%Y-%m-%d")
+                return ""
+
             confidence_over_time = []
             for i, s in enumerate(reversed(sessions[:10])):
                 if s.get("overall_score") is not None:
+                    created_at = s.get("created_at")
                     confidence_over_time.append(
                         {
                             "session_number": i + 1,
                             "score": s["overall_score"],
-                            "date": s.get("created_at", "")[:10],
+                            "date": _date_str(created_at),
                         }
                     )
 

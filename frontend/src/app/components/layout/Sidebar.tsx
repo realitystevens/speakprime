@@ -1,11 +1,12 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, Plus, History, BarChart3, Settings,
   LogOut, ChevronLeft, ChevronRight, Zap, Menu,
 } from "lucide-react";
+import { userApi, type UserProfile } from "@/lib/api";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
@@ -23,12 +24,22 @@ interface SidebarProps {
 export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    userApi.getProfile().then(setProfile).catch(() => { });
+  }, []);
+
+  const initials = profile?.name
+    ? profile.name.trim().split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase()
+    : "?";
+  const displayName = profile?.name ?? "User";
+  const displayEmail = profile?.email ?? "";
 
   return (
     <aside
-      className={`flex flex-col h-screen sticky top-0 transition-all duration-300 bg-[#111111] border-r border-[#2a2a2a] ${
-        collapsed ? "w-[72px]" : "w-60"
-      }`}
+      className={`flex flex-col h-screen sticky top-0 transition-all duration-300 bg-[#111111] border-r border-[#2a2a2a] ${collapsed ? "w-[72px]" : "w-60"
+        }`}
     >
       {/* Logo */}
       <div className="flex items-center justify-between p-4 h-16 border-b border-[#2a2a2a]">
@@ -62,9 +73,8 @@ export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
             <Link
               key={item.path}
               href={item.path}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 no-underline ${
-                active ? "bg-blue-500/15 text-blue-500" : "text-slate-400"
-              }`}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 no-underline ${active ? "bg-blue-500/15 text-blue-500" : "text-slate-400"
+                }`}
               title={collapsed ? item.label : undefined}
             >
               <item.icon size={20} />
@@ -83,11 +93,11 @@ export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
         {!collapsed ? (
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-blue-500 to-violet-500">
-              <span className="text-white text-xs font-bold">DK</span>
+              <span className="text-white text-xs font-bold">{initials}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-slate-50 text-[13px] font-semibold truncate">David Kim</p>
-              <p className="text-slate-500 text-[11px] truncate">david@email.com</p>
+              <p className="text-slate-50 text-[13px] font-semibold truncate">{displayName}</p>
+              <p className="text-slate-500 text-[11px] truncate">{displayEmail}</p>
             </div>
             <button
               onClick={() => router.push("/")}
@@ -126,9 +136,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
       {/* Mobile Sidebar */}
       <div
-        className={`fixed left-0 top-0 z-50 h-full lg:hidden transition-transform duration-300 ${
-          mobileOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed left-0 top-0 z-50 h-full lg:hidden transition-transform duration-300 ${mobileOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         <Sidebar collapsed={false} onToggle={() => setMobileOpen(false)} />
       </div>

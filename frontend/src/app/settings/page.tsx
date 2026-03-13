@@ -1,11 +1,12 @@
-"use client";
+﻿"use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "../components/layout/Sidebar";
 import {
-  User, Bell, Lock, Trash2, Link2, AlertTriangle,
-  ChevronRight, Camera, Check
+  User, Bell, Lock, Trash2, AlertTriangle,
+  ChevronRight, Check, Loader2
 } from "lucide-react";
+import { userApi, type UserProfile } from "@/lib/api";
 
 function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
   return (
@@ -26,10 +27,14 @@ const coachStyles = [
   { id: "gentle", label: "Gentle Guide", emoji: "\ud83c\udf31", desc: "Supportive and nurturing" },
 ];
 
+function getInitials(name: string): string {
+  return name.trim().split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase() || "?";
+}
+
 export default function SettingsPage() {
-  const [name, setName] = useState("David Kim");
-  const [email, setEmail] = useState("david@email.com");
-  const [industry, setIndustry] = useState("Technology");
+  const [profileLoading, setProfileLoading] = useState(true);
+
+  const [name, setName] = useState("");
 
   const [voiceFeedback, setVoiceFeedback] = useState(true);
   const [fillerAlerts, setFillerAlerts] = useState(true);
@@ -44,11 +49,59 @@ export default function SettingsPage() {
   const [sessionReminders, setSessionReminders] = useState(false);
 
   const [dataRetention, setDataRetention] = useState("12 months");
+  const [saving, setSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
-  const handleSave = () => {
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 2500);
+  useEffect(() => {
+    userApi.getProfile()
+      .then((profile: UserProfile) => {
+        setName(profile.name ?? "");
+        setCoachStyle(profile.ai_persona ?? "balanced");
+        const prefs = profile.coaching_preferences;
+        if (prefs) {
+          setVoiceFeedback(prefs.real_time_voice_feedback ?? true);
+          setFillerAlerts(prefs.filler_word_alerts ?? true);
+          setEyeContact(prefs.eye_contact_monitoring ?? true);
+          setSlideAnalysis(prefs.slide_analysis ?? true);
+          setEmailReport(prefs.post_session_email ?? false);
+        }
+      })
+      .catch((err) => console.error("Settings load error:", err))
+      .finally(() => setProfileLoading(false));
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await userApi.updateProfile({
+        ai_persona: coachStyle,
+        coaching_preferences: {
+          real_time_voice_feedback: voiceFeedback,
+          filler_word_alerts: fillerAlerts,
+          eye_contact_monitoring: eyeContact,
+          slide_analysis: slideAnalysis,
+          post_session_email: emailReport,
+        },
+      } as Partial<UserProfile>);
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 2500);
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Failed to save.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!confirm("Are you sure? This permanently deletes your account and all session data.")) return;
+    try {
+      await userApi.deleteAccount();
+      window.location.href = "/";
+    } catch (err) {
+      console.error("Delete account error:", err);
+    }
   };
 
   const sections = [
@@ -57,7 +110,6 @@ export default function SettingsPage() {
     { id: "ai", label: "AI Persona", icon: User },
     { id: "notifications", label: "Notifications", icon: Bell },
     { id: "privacy", label: "Privacy", icon: Lock },
-    { id: "connected", label: "Connected Accounts", icon: Link2 },
     { id: "danger", label: "Danger Zone", icon: Trash2 },
   ];
 
@@ -92,38 +144,23 @@ export default function SettingsPage() {
             {/* Profile */}
             <section id="profile" className="p-6 rounded-2xl bg-[#1e1e1e] border border-[#2a2a2a]">
               <h2 className="text-slate-50 text-base font-bold mb-5">Profile</h2>
-              <div className="flex items-start gap-5 mb-6">
-                <div className="relative">
+              {profileLoading ? (
+                <div className="flex items-center gap-3 text-slate-500 text-sm py-4">
+                  <Loader2 size={18} className="animate-spin" /> Loading profile...
+                </div>
+              ) : (
+                <div className="flex items-start gap-5">
                   <div className="w-16 h-16 rounded-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-violet-500">
-                    <span className="text-white text-xl font-bold">DK</span>
+                    <span className="text-white text-xl font-bold">{getInitials(name)}</span>
                   </div>
-                  <button className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center bg-blue-500 border-2 border-[#1e1e1e]">
-                    <Camera size={10} color="white" />
-                  </button>
+                  <div className="flex-1">
+                    <label className="text-slate-400 text-xs block mb-1.5">Name</label>
+                    <div className="w-full px-3 py-2.5 rounded-lg bg-[#141414] border border-[#2a2a2a] text-slate-50 text-sm">
+                      {name || "-"}
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-slate-50 text-[15px] font-semibold">{name}</p>
-                  <p className="text-slate-500 text-[13px]">{email}</p>
-                  <button className="text-blue-500 text-[13px] mt-1">Change avatar</button>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-slate-400 text-xs block mb-1.5">Full Name</label>
-                  <input value={name} onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-lg outline-none bg-[#141414] border border-[#2a2a2a] text-slate-50 text-sm" />
-                </div>
-                <div>
-                  <label className="text-slate-400 text-xs block mb-1.5">Email Address</label>
-                  <input value={email} onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-lg outline-none bg-[#141414] border border-[#2a2a2a] text-slate-50 text-sm" />
-                </div>
-                <div>
-                  <label className="text-slate-400 text-xs block mb-1.5">Industry / Role</label>
-                  <input value={industry} onChange={(e) => setIndustry(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-lg outline-none bg-[#141414] border border-[#2a2a2a] text-slate-50 text-sm" />
-                </div>
-              </div>
+              )}
             </section>
 
             {/* Coaching Preferences */}
@@ -157,11 +194,10 @@ export default function SettingsPage() {
                   <button
                     key={style.id}
                     onClick={() => setCoachStyle(style.id)}
-                    className={`p-4 rounded-xl text-left transition-all border-2 ${
-                      coachStyle === style.id
-                        ? "bg-blue-500/10 border-blue-500"
-                        : "bg-[#141414] border-[#2a2a2a]"
-                    }`}
+                    className={`p-4 rounded-xl text-left transition-all border-2 ${coachStyle === style.id
+                      ? "bg-blue-500/10 border-blue-500"
+                      : "bg-[#141414] border-[#2a2a2a]"
+                      }`}
                   >
                     <div className="text-2xl mb-2">{style.emoji}</div>
                     <div className="text-slate-50 text-sm font-semibold">{style.label}</div>
@@ -204,11 +240,10 @@ export default function SettingsPage() {
                 <div className="flex gap-2 flex-wrap">
                   {["3 months", "6 months", "12 months", "Forever"].map((opt) => (
                     <button key={opt} onClick={() => setDataRetention(opt)}
-                      className={`px-3 py-2 rounded-lg transition-all text-[13px] border ${
-                        dataRetention === opt
-                          ? "bg-blue-500/[12%] border-blue-500 text-blue-500"
-                          : "bg-[#141414] border-[#2a2a2a] text-slate-500"
-                      }`}>
+                      className={`px-3 py-2 rounded-lg transition-all text-[13px] border ${dataRetention === opt
+                        ? "bg-blue-500/[12%] border-blue-500 text-blue-500"
+                        : "bg-[#141414] border-[#2a2a2a] text-slate-500"
+                        }`}>
                       {opt}
                     </button>
                   ))}
@@ -217,29 +252,6 @@ export default function SettingsPage() {
               <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm">
                 <Trash2 size={15} /> Delete All Session Data
               </button>
-            </section>
-
-            {/* Connected Accounts */}
-            <section id="connected" className="p-6 rounded-2xl bg-[#1e1e1e] border border-[#2a2a2a]">
-              <h2 className="text-slate-50 text-base font-bold mb-5">Connected Accounts</h2>
-              <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-[#141414] border border-[#2a2a2a]">
-                <div className="flex items-center gap-3">
-                  <svg width="22" height="22" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                  </svg>
-                  <div>
-                    <p className="text-slate-50 text-sm font-medium">Google Account</p>
-                    <p className="text-slate-500 text-xs">david@gmail.com</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-green-500" />
-                  <span className="text-green-500 text-xs font-medium">Connected</span>
-                </div>
-              </div>
             </section>
 
             {/* Danger Zone */}
@@ -251,15 +263,22 @@ export default function SettingsPage() {
               <p className="text-slate-400 text-sm mb-4">
                 These actions are irreversible. Please proceed with caution.
               </p>
-              <button className="flex items-center gap-2 px-5 py-3 rounded-xl bg-red-500 text-white text-sm font-semibold">
+              <button
+                onClick={handleDeleteAccount}
+                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-red-500 text-white text-sm font-semibold"
+              >
                 <Trash2 size={16} /> Delete Account Permanently
               </button>
             </section>
 
             {/* Save Button */}
             <div className="flex items-center gap-3 pb-8">
-              <button onClick={handleSave}
-                className="px-8 py-3 rounded-xl transition-all bg-blue-500 text-white text-[15px] font-semibold shadow-[0_0_20px_rgba(59,130,246,0.2)]">
+              <button
+                onClick={handleSave}
+                disabled={saving || profileLoading}
+                className="flex items-center gap-2 px-8 py-3 rounded-xl transition-all bg-blue-500 text-white text-[15px] font-semibold shadow-[0_0_20px_rgba(59,130,246,0.2)] disabled:opacity-60"
+              >
+                {saving && <Loader2 size={16} className="animate-spin" />}
                 Save Changes
               </button>
               {savedSuccess && (
@@ -268,6 +287,9 @@ export default function SettingsPage() {
                   <span className="text-sm">Saved successfully</span>
                 </div>
               )}
+              {saveError && (
+                <p className="text-red-400 text-sm">{saveError}</p>
+              )}
             </div>
           </div>
         </div>
@@ -275,3 +297,5 @@ export default function SettingsPage() {
     </DashboardLayout>
   );
 }
+
+

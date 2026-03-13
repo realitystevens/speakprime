@@ -6,7 +6,18 @@ from core.config import settings
 logger = logging.getLogger(__name__)
 
 # Model name constants
-LIVE_MODEL = "gemini-2.0-flash-live-001"
+
+
+def _normalize_live_model(model_name: str) -> str:
+    model_name = (model_name or "").strip()
+    if not model_name:
+        return "models/gemini-2.5-flash-native-audio-preview-12-2025"
+    if model_name.startswith("models/"):
+        return model_name
+    return f"models/{model_name}"
+
+
+LIVE_MODEL = _normalize_live_model(settings.gemini_live_model)
 FLASH_MODEL = "gemini-2.0-flash"
 PRO_MODEL = "gemini-2.0-pro"
 

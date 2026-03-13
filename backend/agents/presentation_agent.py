@@ -106,18 +106,10 @@ def get_presentation_config(session_config: SessionConfig) -> types.LiveConnectC
 
     full_prompt = PRESENTATION_SYSTEM_PROMPT + context_note
 
+    # Keep live config minimal to avoid 1007 invalid-argument errors with native-audio models.
     config = types.LiveConnectConfig(
-        response_modalities=["AUDIO", "TEXT"],
-        system_instruction=types.Content(
-            parts=[types.Part(text=full_prompt)]
-        ),
-        speech_config=types.SpeechConfig(
-            voice_config=types.VoiceConfig(
-                prebuilt_voice_config=types.PrebuiltVoiceConfig(
-                    voice_name="Kore"  # Warm, supportive voice
-                )
-            )
-        ),
+        response_modalities=["AUDIO"],
+        system_instruction=full_prompt,
     )
     return config
 

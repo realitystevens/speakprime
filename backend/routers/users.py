@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime, timezone
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -21,13 +22,29 @@ def _normalize_user(user_data: dict) -> dict:
 
 @router.get("/me", summary="Get full user profile")
 async def get_my_profile(uid: Annotated[str, Depends(get_current_user)]):
-    """Return the demo user's full profile from Firestore."""
+    """Return the demo user's full profile from Firestore, creating it on first visit."""
     user_data = await firestore_service.get_user(uid)
     if user_data is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User profile not found.",
-        )
+        default_profile = {
+            "uid": uid,
+            "name": "Demo User",
+            "email": "",
+            "avatar_url": None,
+            "role": "both",
+            "industry": None,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "coaching_preferences": {
+                "real_time_voice_feedback": True,
+                "filler_word_alerts": True,
+                "eye_contact_monitoring": True,
+                "slide_analysis": True,
+                "post_session_email": True,
+            },
+            "ai_persona": "balanced",
+        }
+        await firestore_service.create_user(uid, default_profile)
+        user_data = default_profile
+        logger.info(f"Auto-created profile for new demo user uid={uid}")
     return UserProfile(**_normalize_user(user_data)).model_dump(mode="json")
 
 

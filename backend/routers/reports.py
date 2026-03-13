@@ -21,6 +21,21 @@ def _fix_report_datetimes(data: dict) -> None:
         data["generated_at"] = data["generated_at"].isoformat()
 
 
+@router.get("/reports/by-session/{session_id}", summary="Get a report by session id")
+async def get_report_by_session(
+    session_id: str,
+    uid: Annotated[str, Depends(get_current_user)],
+):
+    """Return the coaching report associated with a session."""
+    report_data = await firestore_service.get_session_report(session_id)
+    if report_data is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Report not found.")
+
+    _fix_report_datetimes(report_data)
+    return Report(**report_data).model_dump(mode="json")
+
+
 @router.get("/reports/{report_id}", summary="Get a report by id")
 async def get_report(
     report_id: str,
@@ -97,7 +112,6 @@ async def download_report_pdf(
                 status_code=500, detail="Failed to generate download link.")
 
     return RedirectResponse(url=pdf_url, status_code=302)
-
 
 
 # PDF builder
