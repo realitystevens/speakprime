@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { Loader2 } from "lucide-react";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -13,6 +14,7 @@ interface ConfirmDialogProps {
   onConfirm: () => void;
   onClose: () => void;
   isLoading?: boolean;
+  loadingText?: string;
 }
 
 export function ConfirmDialog({
@@ -26,6 +28,7 @@ export function ConfirmDialog({
   onConfirm,
   onClose,
   isLoading = false,
+  loadingText = "Processing...",
 }: ConfirmDialogProps) {
   if (!open) return null;
 
@@ -62,7 +65,10 @@ export function ConfirmDialog({
             disabled={isLoading}
             className={`flex-1 rounded-2xl py-3 text-sm font-semibold transition-opacity hover:opacity-90 disabled:opacity-60 ${confirmClass}`}
           >
-            {confirmText}
+            <span className="inline-flex items-center justify-center gap-2">
+              {isLoading && <Loader2 size={14} className="animate-spin" />}
+              {isLoading ? loadingText : confirmText}
+            </span>
           </button>
         </div>
       </div>

@@ -55,6 +55,9 @@ export default function SettingsPage() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [showDeleteAccountConfirm, setShowDeleteAccountConfirm] = useState(false);
   const [showDeleteDataConfirm, setShowDeleteDataConfirm] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
+  const [deletingData, setDeletingData] = useState(false);
+  const [actionNotice, setActionNotice] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
     userApi.getProfile()
@@ -98,18 +101,25 @@ export default function SettingsPage() {
   };
 
   const handleDeleteAccount = async () => {
+    setDeletingAccount(true);
     try {
       await userApi.deleteAccount();
       window.location.href = "/";
     } catch (err) {
       console.error("Delete account error:", err);
+      setActionNotice({ type: "error", text: "Could not delete account. Please try again." });
+    } finally {
+      setDeletingAccount(false);
     }
   };
 
   const handleDeleteAllSessionData = async () => {
+    setDeletingData(true);
     // Placeholder until dedicated endpoint is implemented.
     console.warn("Delete all session data endpoint is not implemented yet.");
+    setActionNotice({ type: "success", text: "Delete request completed." });
     setShowDeleteDataConfirm(false);
+    setDeletingData(false);
   };
 
   const sections = [
@@ -128,6 +138,15 @@ export default function SettingsPage() {
           <h1 className="text-slate-50 text-2xl font-extrabold">Settings</h1>
           <p className="text-slate-500 text-sm mt-1">Manage your account and coaching preferences</p>
         </div>
+
+        {actionNotice && (
+          <div className={`mb-6 rounded-xl border px-4 py-3 text-sm ${actionNotice.type === "success"
+            ? "border-green-500/25 bg-green-500/10 text-green-500"
+            : "border-red-500/25 bg-red-500/10 text-red-400"
+            }`}>
+            {actionNotice.text}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 max-w-5xl">
           {/* Sidebar Nav */}
@@ -316,6 +335,8 @@ export default function SettingsPage() {
           await handleDeleteAccount();
           setShowDeleteAccountConfirm(false);
         }}
+        isLoading={deletingAccount}
+        loadingText="Deleting account..."
         icon={<Trash2 size={22} color="#EF4444" />}
       />
 
@@ -326,6 +347,8 @@ export default function SettingsPage() {
         confirmText="Delete Data"
         onClose={() => setShowDeleteDataConfirm(false)}
         onConfirm={handleDeleteAllSessionData}
+        isLoading={deletingData}
+        loadingText="Deleting data..."
         icon={<Trash2 size={22} color="#EF4444" />}
       />
     </DashboardLayout>

@@ -27,6 +27,9 @@ export default function HistoryPage() {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
+  const [isDeletingOne, setIsDeletingOne] = useState(false);
+  const [isDeletingMany, setIsDeletingMany] = useState(false);
+  const [deleteNotice, setDeleteNotice] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
     sessionApi.list({ limit: 100, mode: filter !== "all" ? filter : undefined })
@@ -55,19 +58,24 @@ export default function HistoryPage() {
   }, [sessions]);
 
   const deleteSession = async (id: string) => {
-    try {
-      await sessionApi.delete(id);
-      setSessions((prev) => prev.filter((s) => s.id !== id));
-      setTotal((t) => t - 1);
-    } catch (err) {
-      console.error("Delete session error:", err);
-    }
+    await sessionApi.delete(id);
+    setSessions((prev) => prev.filter((s) => s.id !== id));
+    setTotal((t) => Math.max(0, t - 1));
   };
 
   const confirmDeleteSession = async () => {
     if (!pendingDeleteId) return;
-    await deleteSession(pendingDeleteId);
-    setPendingDeleteId(null);
+    setIsDeletingOne(true);
+    try {
+      await deleteSession(pendingDeleteId);
+      setDeleteNotice({ type: "success", text: "Session deleted successfully." });
+      setPendingDeleteId(null);
+    } catch (err) {
+      console.error("Delete session error:", err);
+      setDeleteNotice({ type: "error", text: "Could not delete session. Please try again." });
+    } finally {
+      setIsDeletingOne(false);
+    }
   };
 
   const toggleSelected = (id: string) => {
@@ -102,6 +110,7 @@ export default function HistoryPage() {
       return;
     }
 
+    setIsDeletingMany(true);
     const results = await Promise.allSettled(idsToDelete.map((id) => sessionApi.delete(id)));
     const succeededIds = idsToDelete.filter((_, i) => results[i].status === "fulfilled");
 
@@ -117,11 +126,16 @@ export default function HistoryPage() {
     }
 
     const failedCount = results.length - succeededIds.length;
-    if (failedCount > 0) {
-      console.error(`Failed to delete ${failedCount} session(s).`);
+    if (failedCount > 0 && succeededIds.length > 0) {
+      setDeleteNotice({ type: "error", text: `Deleted ${succeededIds.length} session(s), ${failedCount} failed.` });
+    } else if (failedCount > 0) {
+      setDeleteNotice({ type: "error", text: `Failed to delete ${failedCount} session(s).` });
+    } else {
+      setDeleteNotice({ type: "success", text: `Deleted ${succeededIds.length} session(s) successfully.` });
     }
 
     setShowBulkDeleteConfirm(false);
+    setIsDeletingMany(false);
   };
 
   return (
@@ -132,6 +146,15 @@ export default function HistoryPage() {
           <h1 className="text-slate-50 text-2xl font-extrabold">Session History</h1>
           <p className="text-slate-500 text-sm mt-1">{total} sessions completed</p>
         </div>
+
+        {deleteNotice && (
+          <div className={`rounded-xl border px-4 py-3 text-sm ${deleteNotice.type === "success"
+            ? "border-green-500/25 bg-green-500/10 text-green-500"
+            : "border-red-500/25 bg-red-500/10 text-red-400"
+            }`}>
+            {deleteNotice.text}
+          </div>
+        )}
 
         {/* Filter Bar */}
         <div className="flex flex-col sm:flex-row gap-3">
@@ -280,6 +303,8 @@ export default function HistoryPage() {
         confirmText="Delete"
         onClose={() => setPendingDeleteId(null)}
         onConfirm={confirmDeleteSession}
+        isLoading={isDeletingOne}
+        loadingText="Deleting..."
         icon={<Trash2 size={22} color="#EF4444" />}
       />
 
@@ -290,6 +315,8 @@ export default function HistoryPage() {
         confirmText="Delete Selected"
         onClose={() => setShowBulkDeleteConfirm(false)}
         onConfirm={deleteSelectedSessions}
+        isLoading={isDeletingMany}
+        loadingText="Deleting selected..."
         icon={<Trash2 size={22} color="#EF4444" />}
       />
     </DashboardLayout>
