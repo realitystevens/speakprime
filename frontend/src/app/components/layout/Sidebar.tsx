@@ -7,6 +7,7 @@ import {
   LogOut, ChevronLeft, ChevronRight, Zap, Menu,
 } from "lucide-react";
 import { userApi, type UserProfile } from "@/lib/api";
+import { ConfirmDialog } from "@/app/components/ui/ConfirmDialog";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
@@ -25,6 +26,7 @@ export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   useEffect(() => {
     userApi.getProfile().then(setProfile).catch(() => { });
@@ -100,7 +102,7 @@ export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
               <p className="text-slate-500 text-[11px] truncate">{displayEmail}</p>
             </div>
             <button
-              onClick={() => router.push("/")}
+              onClick={() => setShowLogoutConfirm(true)}
               className="p-1 rounded-md transition-colors text-slate-500 hover:text-red-400"
               title="Logout"
             >
@@ -116,6 +118,20 @@ export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
           </button>
         )}
       </div>
+
+      <ConfirmDialog
+        open={showLogoutConfirm}
+        title="Log out?"
+        description="You will be returned to the home page."
+        confirmText="Log Out"
+        variant="default"
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={() => {
+          setShowLogoutConfirm(false);
+          router.push("/");
+        }}
+        icon={<LogOut size={22} color="#3B82F6" />}
+      />
     </aside>
   );
 }

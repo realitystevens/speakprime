@@ -5,6 +5,7 @@ import Link from "next/link";
 import { DashboardLayout } from "../components/layout/Sidebar";
 import { Mic, Monitor, Calendar, Clock, ExternalLink, Trash2, Search } from "lucide-react";
 import { sessionApi, type Session } from "@/lib/api";
+import { ConfirmDialog } from "@/app/components/ui/ConfirmDialog";
 
 type Filter = "all" | "interview" | "presentation";
 
@@ -23,6 +24,7 @@ export default function HistoryPage() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     sessionApi.list({ limit: 100, mode: filter !== "all" ? filter : undefined })
@@ -46,6 +48,12 @@ export default function HistoryPage() {
     } catch (err) {
       console.error("Delete session error:", err);
     }
+  };
+
+  const confirmDeleteSession = async () => {
+    if (!pendingDeleteId) return;
+    await deleteSession(pendingDeleteId);
+    setPendingDeleteId(null);
   };
 
   return (
@@ -153,7 +161,7 @@ export default function HistoryPage() {
                     </Link>
                   )}
                   <button
-                    onClick={() => deleteSession(session.id)}
+                    onClick={() => setPendingDeleteId(session.id)}
                     className="p-2 rounded-lg transition-colors hover:text-red-400 text-slate-500 border border-[#2a2a2a]">
                     <Trash2 size={15} />
                   </button>
@@ -163,6 +171,16 @@ export default function HistoryPage() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={pendingDeleteId !== null}
+        title="Delete session?"
+        description="This will permanently remove the session and its associated data."
+        confirmText="Delete"
+        onClose={() => setPendingDeleteId(null)}
+        onConfirm={confirmDeleteSession}
+        icon={<Trash2 size={22} color="#EF4444" />}
+      />
     </DashboardLayout>
   );
 }

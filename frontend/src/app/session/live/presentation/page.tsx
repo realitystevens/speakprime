@@ -6,6 +6,7 @@ import {
   Mic, MicOff, Video, VideoOff, PhoneOff,
   ChevronLeft, ChevronRight, X, LayoutGrid, Maximize2,
 } from "lucide-react";
+import { ConfirmDialog } from "@/app/components/ui/ConfirmDialog";
 
 const WS_BASE = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:8000";
 
@@ -485,30 +486,15 @@ function LivePresentationInner() {
         </div>
       )}
 
-      {/* End confirm modal */}
-      {showEndConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md">
-          <div className="p-8 rounded-3xl w-full max-w-sm bg-[#0F172A] border border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.6)]">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-5 bg-red-500/[0.12] border border-red-500/25">
-              <PhoneOff size={22} color="#EF4444" />
-            </div>
-            <h3 className="text-[#F8FAFC] text-[18px] font-bold text-center mb-2">End Presentation?</h3>
-            <p className="text-slate-500 text-sm text-center mb-7 leading-[1.6]">
-              Your presentation will be saved and a full performance report will be generated.
-            </p>
-            <div className="flex gap-3">
-              <button onClick={() => setShowEndConfirm(false)}
-                className="flex-1 py-3 rounded-2xl transition-opacity hover:opacity-80 bg-[#2a2a2a] border border-white/10 text-slate-400 text-sm">
-                Cancel
-              </button>
-              <button onClick={handleEndSession}
-                className="flex-1 py-3 rounded-2xl transition-opacity hover:opacity-90 bg-red-500 text-white text-sm font-semibold">
-                End & Generate Report
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog
+        open={showEndConfirm}
+        title="End Presentation?"
+        description="Your presentation will be saved and a full performance report will be generated."
+        confirmText="End & Generate Report"
+        onClose={() => setShowEndConfirm(false)}
+        onConfirm={handleEndSession}
+        icon={<PhoneOff size={22} color="#EF4444" />}
+      />
     </div>
   );
 }

@@ -7,6 +7,7 @@ import {
   ChevronRight, Check, Loader2
 } from "lucide-react";
 import { userApi, type UserProfile } from "@/lib/api";
+import { ConfirmDialog } from "@/app/components/ui/ConfirmDialog";
 
 function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
   return (
@@ -52,6 +53,8 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [showDeleteAccountConfirm, setShowDeleteAccountConfirm] = useState(false);
+  const [showDeleteDataConfirm, setShowDeleteDataConfirm] = useState(false);
 
   useEffect(() => {
     userApi.getProfile()
@@ -95,13 +98,18 @@ export default function SettingsPage() {
   };
 
   const handleDeleteAccount = async () => {
-    if (!confirm("Are you sure? This permanently deletes your account and all session data.")) return;
     try {
       await userApi.deleteAccount();
       window.location.href = "/";
     } catch (err) {
       console.error("Delete account error:", err);
     }
+  };
+
+  const handleDeleteAllSessionData = async () => {
+    // Placeholder until dedicated endpoint is implemented.
+    console.warn("Delete all session data endpoint is not implemented yet.");
+    setShowDeleteDataConfirm(false);
   };
 
   const sections = [
@@ -249,7 +257,10 @@ export default function SettingsPage() {
                   ))}
                 </div>
               </div>
-              <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm">
+              <button
+                onClick={() => setShowDeleteDataConfirm(true)}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm"
+              >
                 <Trash2 size={15} /> Delete All Session Data
               </button>
             </section>
@@ -264,7 +275,7 @@ export default function SettingsPage() {
                 These actions are irreversible. Please proceed with caution.
               </p>
               <button
-                onClick={handleDeleteAccount}
+                onClick={() => setShowDeleteAccountConfirm(true)}
                 className="flex items-center gap-2 px-5 py-3 rounded-xl bg-red-500 text-white text-sm font-semibold"
               >
                 <Trash2 size={16} /> Delete Account Permanently
@@ -294,6 +305,29 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={showDeleteAccountConfirm}
+        title="Delete account permanently?"
+        description="This action cannot be undone. Your account and all associated session data will be removed."
+        confirmText="Delete Account"
+        onClose={() => setShowDeleteAccountConfirm(false)}
+        onConfirm={async () => {
+          await handleDeleteAccount();
+          setShowDeleteAccountConfirm(false);
+        }}
+        icon={<Trash2 size={22} color="#EF4444" />}
+      />
+
+      <ConfirmDialog
+        open={showDeleteDataConfirm}
+        title="Delete all session data?"
+        description="This will remove all session history and reports for your account."
+        confirmText="Delete Data"
+        onClose={() => setShowDeleteDataConfirm(false)}
+        onConfirm={handleDeleteAllSessionData}
+        icon={<Trash2 size={22} color="#EF4444" />}
+      />
     </DashboardLayout>
   );
 }
