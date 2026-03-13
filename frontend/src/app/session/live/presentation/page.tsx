@@ -63,6 +63,8 @@ function LivePresentationInner() {
   const slideIndexRef = useRef(slideIndex);
   const slideTimerRef = useRef(slideTimer);
   const timerRef = useRef(timer);
+  const micStreamRef = useRef<MediaStream | null>(null);
+  const webcamStreamRef = useRef<MediaStream | null>(null);
 
   useEffect(() => { mutedRef.current = muted; }, [muted]);
   useEffect(() => { slideIndexRef.current = slideIndex; }, [slideIndex]);
@@ -85,6 +87,18 @@ function LivePresentationInner() {
     source.onended = playNext;
     source.start();
     isPlayingRef.current = true;
+  }, []);
+
+  const stopLocalMedia = useCallback(() => {
+    micStreamRef.current?.getTracks().forEach((t) => t.stop());
+    micStreamRef.current = null;
+
+    webcamStreamRef.current?.getTracks().forEach((t) => t.stop());
+    webcamStreamRef.current = null;
+
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
   }, []);
 
   const enqueueAudioBase64 = useCallback((b64: string) => {
@@ -111,10 +125,12 @@ function LivePresentationInner() {
 
   const setupMic = useCallback(async (ctx: AudioContext) => {
     try {
+      micStreamRef.current?.getTracks().forEach((t) => t.stop());
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true },
         video: false,
       });
+      micStreamRef.current = stream;
       await ctx.audioWorklet.addModule("/audio-processor.worklet.js");
       const source = ctx.createMediaStreamSource(stream);
       const worklet = new AudioWorkletNode(ctx, "audio-capture-processor");
@@ -195,6 +211,7 @@ function LivePresentationInner() {
           }
           case "session_ended":
             reportIdRef.current = msg.report_id;
+            stopLocalMedia();
             navigate.push(`/session/report/${msg.report_id}`);
             break;
           case "error":
@@ -212,17 +229,25 @@ function LivePresentationInner() {
       audioCtxRef.current?.close();
       audioCtxRef.current = null;
       if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+      stopLocalMedia();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionId]);
+  }, [sessionId, stopLocalMedia]);
 
   // Camera PIP
   useEffect(() => {
     let stream: MediaStream | null = null;
     navigator.mediaDevices.getUserMedia({ video: true })
-      .then((s) => { stream = s; if (videoRef.current) videoRef.current.srcObject = s; })
+      .then((s) => {
+        stream = s;
+        webcamStreamRef.current = s;
+        if (videoRef.current) videoRef.current.srcObject = s;
+      })
       .catch(() => { });
-    return () => { stream?.getTracks().forEach((t) => t.stop()); };
+    return () => {
+      stream?.getTracks().forEach((t) => t.stop());
+      if (webcamStreamRef.current === stream) webcamStreamRef.current = null;
+    };
   }, []);
 
   const handleMuteToggle = () => {
@@ -236,6 +261,7 @@ function LivePresentationInner() {
   };
 
   const handleEndSession = () => {
+    stopLocalMedia();
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({ type: "end_session" }));
     }
