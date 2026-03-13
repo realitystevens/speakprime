@@ -30,7 +30,7 @@ const feedbackColors: Record<FeedbackType, { border: string; bg: string }> = {
   green: { border: "#22C55E", bg: "rgba(34,197,94,0.08)" },
 };
 
-const emoji: Record<FeedbackType, string> = { red: "ðŸ”´", yellow: "ðŸŸ¡", green: "ðŸŸ¢" };
+const emoji: Record<FeedbackType, string> = { red: "[RED]", yellow: "[YELLOW]", green: "[GREEN]" };
 
 function LivePresentationInner() {
   const navigate = useRouter();
@@ -287,7 +287,7 @@ function LivePresentationInner() {
   return (
     <div className="h-screen w-screen overflow-hidden relative select-none bg-[#1c1c1c]">
 
-      {/* â”€â”€ MAIN STAGE: Slide â”€â”€ */}
+      {/* Main stage: slide */}
       <div className={`absolute inset-0 flex flex-col items-center justify-center pt-[68px] pb-[84px] transition-[padding] duration-300 ${showPanel ? "sm:pr-[380px]" : ""}`}>
         <div className="relative w-full h-full flex items-center justify-center px-8">
           {/* Slide card */}
@@ -304,10 +304,10 @@ function LivePresentationInner() {
               </div>
               <p className="text-slate-500 text-lg font-medium">Slide {slideIndex + 1}</p>
               {wsStatus === "connecting" && (
-                <p className="text-slate-600 text-sm">Connecting to AI coachâ€¦</p>
+                <p className="text-slate-600 text-sm">Connecting to AI coach...</p>
               )}
               {wsStatus === "error" && (
-                <p className="text-red-400 text-sm">Connection error â€” check backend</p>
+                <p className="text-red-400 text-sm">Connection error - check backend</p>
               )}
             </div>
 
@@ -329,7 +329,7 @@ function LivePresentationInner() {
         </div>
       </div>
 
-      {/* â”€â”€ USER WEBCAM PIP â”€â”€ */}
+      {/* User webcam PIP */}
       <div className={`absolute z-20 rounded-2xl overflow-hidden top-20 w-[188px] h-[140px] border-2 border-white/[0.12] shadow-[0_8px_32px_rgba(0,0,0,0.7)] bg-[#111827] transition-[right] duration-300 ease-out right-4 ${showPanel ? "sm:right-[396px]" : ""}`}>
         <video ref={videoRef} autoPlay muted playsInline className={`w-full h-full object-cover ${cameraOff ? "opacity-0" : "opacity-100"}`} />
         {cameraOff && (
@@ -341,7 +341,7 @@ function LivePresentationInner() {
           <div className="flex items-center gap-1.5">
             <div className="w-1.5 h-1.5 rounded-full" style={{ background: eyeContact === "good" ? "#22C55E" : "#EF4444" }} />
             <span className="text-white text-[10px] font-semibold">
-              {eyeContact === "good" ? "Eye contact âœ“" : "Look at camera"}
+              {eyeContact === "good" ? "Eye contact OK" : "Look at camera"}
             </span>
           </div>
         </div>
@@ -352,7 +352,7 @@ function LivePresentationInner() {
         )}
       </div>
 
-      {/* â”€â”€ TOP BAR â”€â”€ */}
+      {/* Top bar */}
       <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-20 gap-3">
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[rgba(239,68,68,0.92)] backdrop-blur-sm">
@@ -375,7 +375,7 @@ function LivePresentationInner() {
                   <div key={i} className="w-0.5 rounded-sm" style={{ height: "100%", background: "#3B82F6", animation: `waveform 0.5s ease ${d}s infinite` }} />
                 ))}
               </div>
-              <span className="text-blue-500 text-xs">AI feedbackâ€¦</span>
+              <span className="text-blue-500 text-xs">AI feedback...</span>
             </div>
           )}
           <button onClick={() => setShowPanel(!showPanel)}
@@ -386,7 +386,7 @@ function LivePresentationInner() {
         </div>
       </div>
 
-      {/* â”€â”€ BOTTOM CONTROLS â”€â”€ */}
+      {/* Bottom controls */}
       <div className={`absolute bottom-5 left-0 right-0 flex items-center justify-center z-20 transition-[padding] duration-300 ${showPanel ? "sm:pr-[380px]" : ""}`}>
         <div className="flex items-center gap-3 px-5 py-3 rounded-full bg-[rgba(10,14,26,0.88)] backdrop-blur-2xl border border-white/[0.09] shadow-[0_8px_40px_rgba(0,0,0,0.6)]">
           {/* Slide prev */}
@@ -421,7 +421,7 @@ function LivePresentationInner() {
         </div>
       </div>
 
-      {/* â”€â”€ RIGHT COACH PANEL â”€â”€ */}
+      {/* Right coach panel */}
       {showPanel && (
         <div className="coach-panel fixed inset-0 sm:absolute sm:inset-auto sm:top-0 sm:right-0 sm:bottom-0 z-30 flex flex-col w-full sm:w-[380px] bg-[rgba(18,18,18,0.97)] backdrop-blur-[32px] border-l border-white/[0.07]">
           <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.07]">
@@ -437,9 +437,9 @@ function LivePresentationInner() {
           {/* Eye contact */}
           <div className="px-5 py-4 space-y-2 border-b border-white/[0.07]">
             <div className={`flex items-center gap-2.5 p-3 rounded-xl ${eyeContact === "bad" ? "bg-red-500/[0.08] border border-red-500/20" : "bg-green-500/[0.08] border border-green-500/20"}`}>
-              <span className="text-[14px]">{eyeContact === "bad" ? "ðŸ”´" : "ðŸŸ¢"}</span>
+              <span className="text-[14px]">{eyeContact === "bad" ? "[RED]" : "[GREEN]"}</span>
               <span className={`text-xs ${eyeContact === "bad" ? "text-red-500" : "text-green-500"}`}>
-                {eyeContact === "bad" ? "Reading from slides â€” look at camera" : "Good eye contact â€” keep it up"}
+                {eyeContact === "bad" ? "Reading from slides - look at camera" : "Good eye contact - keep it up"}
               </span>
             </div>
           </div>
@@ -457,7 +457,7 @@ function LivePresentationInner() {
           <div className="flex-1 overflow-auto px-5 py-4">
             <p className="text-slate-600 text-[10px] font-bold uppercase tracking-[0.08em] mb-3">Coaching Feed</p>
             {feedbackFeed.length === 0 ? (
-              <p className="text-[#334155] text-xs">Coaching tips will appear as you presentâ€¦</p>
+              <p className="text-[#334155] text-xs">Coaching tips will appear as you present...</p>
             ) : (
               <div className="space-y-2">
                 {feedbackFeed.map((f) => (
@@ -479,13 +479,13 @@ function LivePresentationInner() {
                   <div key={i} className="w-1 rounded-sm" style={{ height: "100%", background: "#3B82F6", animation: `waveform 0.6s ease ${delay}s infinite` }} />
                 ))}
               </div>
-              <span className="text-blue-500 text-xs">AI feedback playingâ€¦</span>
+              <span className="text-blue-500 text-xs">AI feedback playing...</span>
             </div>
           )}
         </div>
       )}
 
-      {/* â”€â”€ END CONFIRM MODAL â”€â”€ */}
+      {/* End confirm modal */}
       {showEndConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md">
           <div className="p-8 rounded-3xl w-full max-w-sm bg-[#0F172A] border border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.6)]">

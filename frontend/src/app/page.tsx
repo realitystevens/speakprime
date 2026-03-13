@@ -14,7 +14,7 @@ const features = [
   {
     icon: Mic,
     title: "Real-Time Voice Coaching",
-    desc: "Flags filler words, pacing issues, and confidence drops as you speak â€” instantly.",
+    desc: "Flags filler words, pacing issues, and confidence drops as you speak - instantly.",
     iconBg: "bg-blue-500/10",
     iconColor: "text-blue-500",
   },
@@ -82,7 +82,7 @@ export default function Home() {
           </h1>
 
           <p className="animate-fade-in-up-delay2 max-w-2xl mx-auto text-[#94A3B8] text-lg leading-[1.7] mb-10">
-            An AI coach that watches you, listens to you, and gives feedback in real time â€”
+            An AI coach that watches you, listens to you, and gives feedback in real time -
             for job interviews and presentations. Built on Google Gemini Live API.
           </p>
 
@@ -118,7 +118,7 @@ export default function Home() {
                 <div className="p-6 border-b sm:border-b-0 sm:border-r border-[#2a2a2a]">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-2 h-2 rounded-full bg-red-500" />
-                    <span className="text-red-500 text-[11px] font-semibold">â— LIVE</span>
+                    <span className="text-red-500 text-[11px] font-semibold">LIVE</span>
                     <span className="text-[#64748B] text-[11px]">12:34</span>
                   </div>
                   <div className="rounded-xl overflow-hidden mb-3 bg-[#0d0d0d] aspect-[4/3]">
@@ -131,7 +131,7 @@ export default function Home() {
                     <span className="text-green-500 text-[11px]">Strong Delivery</span>
                   </div>
                   <div className="mt-2 p-2 rounded-lg bg-red-500/10 border border-red-500/20 border-l-[3px] border-l-red-500">
-                    <span className="text-[#F8FAFC] text-[11px]">ðŸ”´ You said &apos;um&apos; 3 times â€” pause instead</span>
+                    <span className="text-[#F8FAFC] text-[11px]">Alert: You said &apos;um&apos; 3 times - pause instead</span>
                   </div>
                 </div>
                 <div className="p-6">
@@ -149,7 +149,7 @@ export default function Home() {
                     <span className="px-2 py-0.5 rounded bg-amber-500/15 text-amber-500 text-[10px]">Too much text</span>
                   </div>
                   <div className="p-2 rounded-lg bg-blue-500/10 border border-blue-500/20 border-l-[3px] border-l-blue-500">
-                    <span className="text-[#F8FAFC] text-[11px]">ðŸŸ¢ Great energy on that transition!</span>
+                    <span className="text-[#F8FAFC] text-[11px]">Great energy on that transition!</span>
                   </div>
                 </div>
               </div>
@@ -209,7 +209,7 @@ export default function Home() {
               </div>
               <h3 className="text-[#F8FAFC] text-[22px] font-bold mb-3">Presentation Mode</h3>
               <p className="text-[#94A3B8] text-[15px] leading-[1.7]">
-                Present your slides live. Get real-time coaching on delivery, structure, pacing, and slide quality â€” all at once.
+                Present your slides live. Get real-time coaching on delivery, structure, pacing, and slide quality - all at once.
               </p>
               <Link href="/session/setup"
                 className="inline-flex items-center gap-2 mt-6 px-5 py-2.5 rounded-lg transition-colors bg-violet-500 text-white text-sm font-semibold no-underline">
@@ -255,7 +255,7 @@ export default function Home() {
             </div>
             <span className="text-[#F8FAFC] font-bold">Speakprime</span>
           </div>
-          <p className="text-[#444] text-[13px]">Built with Gemini Live API & Google Cloud Â· Hackathon 2026</p>
+          <p className="text-[#444] text-[13px]">Built with Gemini Live API & Google Cloud | Hackathon 2026</p>
         </div>
       </footer>
     </div>

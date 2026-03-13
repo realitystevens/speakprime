@@ -70,7 +70,7 @@ function scoreStatus(score: number): "green" | "yellow" | "red" {
 }
 
 function formatDuration(seconds: number | null): string {
-  if (!seconds) return "â€”";
+  if (!seconds) return "-";
   const m = Math.floor(seconds / 60);
   return `${m} min`;
 }
@@ -165,7 +165,7 @@ export default function ReportPage() {
           const s = await sessionApi.get(r.session_id);
           setSession(s);
         } catch {
-          // Non-critical â€” continue without session metadata
+          // Non-critical - continue without session metadata
         }
       }
     } catch (err) {
@@ -213,7 +213,7 @@ export default function ReportPage() {
     }
   };
 
-  // â”€â”€ Derived display data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Derived display data
 
   const isPresentation = session?.mode === "presentation";
 
@@ -250,17 +250,17 @@ export default function ReportPage() {
 
   const sessionTitle = session?.name ?? "Session Report";
   const sessionDate = session?.created_at ? formatDate(session.created_at)
-    : report?.generated_at ? formatDate(report.generated_at) : "â€”";
+    : report?.generated_at ? formatDate(report.generated_at) : "-";
   const sessionDuration = formatDuration(session?.duration_seconds ?? null);
 
-  // â”€â”€ Loading / Error states â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Loading / error states
 
   if (loading) {
     return (
       <DashboardLayout>
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
           <Loader2 size={36} className="text-blue-500 animate-spin" />
-          <p className="text-slate-400 text-sm">Loading reportâ€¦</p>
+          <p className="text-slate-400 text-sm">Loading report...</p>
         </div>
       </DashboardLayout>
     );
@@ -285,7 +285,7 @@ export default function ReportPage() {
       <DashboardLayout>
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
           <Loader2 size={36} className="text-blue-500 animate-spin" />
-          <p className="text-slate-50 text-base font-semibold">Generating your reportâ€¦</p>
+          <p className="text-slate-50 text-base font-semibold">Generating your report...</p>
           <p className="text-slate-500 text-sm text-center max-w-xs">
             Our AI is analysing your session. This usually takes less than a minute.
           </p>
@@ -294,7 +294,7 @@ export default function ReportPage() {
     );
   }
 
-  // â”€â”€ Main render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Main render
 
   return (
     <DashboardLayout>
@@ -506,7 +506,7 @@ export default function ReportPage() {
                           <div className="w-3 h-3 rounded-full border-2 border-white"
                             style={{ background: color }} />
                           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity bg-[#333333] text-[#F8FAFC] text-[11px] max-w-[200px] truncate">
-                            {mins}:{secs} â€” {event.message}
+                            {mins}:{secs} - {event.message}
                           </div>
                         </div>
                       );
