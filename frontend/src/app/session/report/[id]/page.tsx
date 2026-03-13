@@ -132,6 +132,7 @@ export default function ReportPage() {
   const [activeTab, setActiveTab] = useState<"overview" | "slides">("overview");
   const [downloadingPdf, setDownloadingPdf] = useState(false);
   const pollRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const missingReportPollsRef = useRef(0);
 
   const loadReport = useCallback(async (isPolling = false) => {
     try {
@@ -142,6 +143,7 @@ export default function ReportPage() {
       } catch {
         r = await reportApi.getBySession(id);
       }
+      missingReportPollsRef.current = 0;
       setReport(r);
 
       // Check if still generating
@@ -167,7 +169,20 @@ export default function ReportPage() {
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Report not found.");
+      const message = err instanceof Error ? err.message : "Report not found.";
+      const isNotFound = message.includes("API 404");
+
+      // Report generation is async; allow polling for a while instead of failing immediately.
+      if (isNotFound && missingReportPollsRef.current < 30) {
+        missingReportPollsRef.current += 1;
+        setError(null);
+        setGenerating(true);
+        if (!isPolling) setLoading(false);
+        pollRef.current = setTimeout(() => loadReport(true), 3000);
+        return;
+      }
+
+      setError(message);
     } finally {
       if (!isPolling) setLoading(false);
     }
