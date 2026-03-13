@@ -18,8 +18,8 @@ def _normalize_live_model(model_name: str) -> str:
 
 
 LIVE_MODEL = _normalize_live_model(settings.gemini_live_model)
-FLASH_MODEL = "gemini-2.0-flash"
-PRO_MODEL = "gemini-2.0-pro"
+FLASH_MODEL = "models/gemini-2.5-flash"
+PRO_MODEL = "models/gemini-2.5-pro"
 
 _genai_client: genai.Client | None = None
 

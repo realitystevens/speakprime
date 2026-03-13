@@ -86,7 +86,6 @@ async def _save_feedback(
         logger.warning(f"Failed to save feedback event: {e}")
 
 
-
 # Interview WebSocket
 
 @router.websocket("/interview/{session_id}")
@@ -144,7 +143,10 @@ async def interview_websocket(
                 nonlocal muted
                 try:
                     while not stop_event.is_set():
-                        message = await websocket.receive()
+                        try:
+                            message = await asyncio.wait_for(websocket.receive(), timeout=1.0)
+                        except asyncio.TimeoutError:
+                            continue
 
                         if message.get("type") == "websocket.disconnect":
                             stop_event.set()
@@ -244,19 +246,16 @@ async def interview_websocket(
             client_task = asyncio.create_task(receive_from_client())
             gemini_task = asyncio.create_task(receive_from_gemini())
 
-            await asyncio.wait(
-                [client_task, gemini_task],
-                return_when=asyncio.FIRST_COMPLETED,
-            )
+            # Keep the session alive until the client explicitly ends/disconnects.
+            await client_task
+            stop_event.set()
 
-            # Cleanup
-            for task in (client_task, gemini_task):
-                if not task.done():
-                    task.cancel()
-                    try:
-                        await task
-                    except (asyncio.CancelledError, Exception):
-                        pass
+            if not gemini_task.done():
+                gemini_task.cancel()
+            try:
+                await gemini_task
+            except (asyncio.CancelledError, Exception):
+                pass
 
         # Session ended — generate report via the sessions router logic
         from routers.sessions import _run_report_generation
@@ -365,7 +364,10 @@ async def presentation_websocket(
                 nonlocal muted
                 try:
                     while not stop_event.is_set():
-                        message = await websocket.receive()
+                        try:
+                            message = await asyncio.wait_for(websocket.receive(), timeout=1.0)
+                        except asyncio.TimeoutError:
+                            continue
 
                         if message.get("type") == "websocket.disconnect":
                             stop_event.set()
@@ -484,18 +486,16 @@ async def presentation_websocket(
             client_task = asyncio.create_task(receive_from_client())
             gemini_task = asyncio.create_task(receive_from_gemini())
 
-            await asyncio.wait(
-                [client_task, gemini_task],
-                return_when=asyncio.FIRST_COMPLETED,
-            )
+            # Keep the session alive until the client explicitly ends/disconnects.
+            await client_task
+            stop_event.set()
 
-            for task in (client_task, gemini_task):
-                if not task.done():
-                    task.cancel()
-                    try:
-                        await task
-                    except (asyncio.CancelledError, Exception):
-                        pass
+            if not gemini_task.done():
+                gemini_task.cancel()
+            try:
+                await gemini_task
+            except (asyncio.CancelledError, Exception):
+                pass
 
         # Generate report
         from routers.sessions import _run_report_generation
