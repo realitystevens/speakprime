@@ -95,15 +95,35 @@ def get_interview_config(session_config: SessionConfig) -> types.LiveConnectConf
         ", ".join(
             session_config.focus_areas) if session_config.focus_areas else "general competencies"
     )
+    company_name_str = session_config.company_name or "the target company"
+    company_link_str = session_config.company_link or "not provided"
+    job_posting_link_str = session_config.job_posting_link or "not provided"
+    interview_goal_str = session_config.interview_goal or "practice and improve interview performance"
+    interview_context_str = session_config.interview_context or "not provided"
+    interviewer_persona_str = session_config.interviewer_persona or "a professional hiring interviewer"
+    resume_highlights_str = session_config.resume_highlights or "not provided"
+    must_cover_topics_str = ", ".join(
+        session_config.must_cover_topics) if session_config.must_cover_topics else "none provided"
 
     context_note = (
         f"\n\nSESSION CONTEXT:\n"
         f"- Job Role: {job_role_str}\n"
+        f"- Company: {company_name_str}\n"
         f"- Interview Type: {interview_type_str}\n"
         f"- Duration: {session_config.duration_minutes} minutes\n"
         f"- Focus Areas: {focus_areas_str}\n"
+        f"- Interview Goal: {interview_goal_str}\n"
+        f"- Interviewer Persona: {interviewer_persona_str}\n"
+        f"- Company Link: {company_link_str}\n"
+        f"- Job Posting Link: {job_posting_link_str}\n"
+        f"- Resume Highlights: {resume_highlights_str}\n"
+        f"- Must Cover Topics: {must_cover_topics_str}\n"
+        f"- Additional Interview Context: {interview_context_str}\n"
         f"- Difficulty: {session_config.difficulty or 'medium'}"
         f"{persona_note}"
+        f"\n\nCOACHING DIRECTIVE:\n"
+        f"Simulate a realistic interviewer from {company_name_str} and ask questions grounded in the links and context above. "
+        f"Keep active coaching behavior: detect weak STAR structure, filler words, pacing issues, and confidence gaps while the candidate responds."
     )
 
     full_prompt = INTERVIEW_SYSTEM_PROMPT + context_note

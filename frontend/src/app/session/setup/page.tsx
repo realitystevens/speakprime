@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { sessionApi } from "@/lib/api";
 
-const interviewTypes = ["Behavioral", "Technical", "Case Study", "Mixed"];
+const interviewTypes = ["Behavioral", "Technical", "Case Study", "Mixed", "Other"];
 const durations = ["15 min", "30 min", "45 min", "60 min"];
 const presentationDurations = ["5 min", "10 min", "20 min", "30 min+"];
 const audienceTypes = ["Executives", "Investors", "Team", "Conference", "Mixed"];
@@ -32,6 +32,14 @@ export default function SessionSetupPage() {
   const [duration, setDuration] = useState("30 min");
   const [difficulty, setDifficulty] = useState(50);
   const [jobRole, setJobRole] = useState("");
+  const [interviewGoal, setInterviewGoal] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [companyLink, setCompanyLink] = useState("");
+  const [jobPostingLink, setJobPostingLink] = useState("");
+  const [interviewerPersona, setInterviewerPersona] = useState("");
+  const [resumeHighlights, setResumeHighlights] = useState("");
+  const [interviewContext, setInterviewContext] = useState("");
+  const [mustCoverTopicsInput, setMustCoverTopicsInput] = useState("");
   const [presentationTopic, setPresentationTopic] = useState("");
   const [audience, setAudience] = useState("Mixed");
   const [selectedFocus, setSelectedFocus] = useState<string[]>(["Eye Contact", "Confidence"]);
@@ -133,9 +141,20 @@ export default function SessionSetupPage() {
         config: {
           mode,
           ...(mode === "interview" && {
-            interview_type: interviewType.toLowerCase().replace(" ", "_"),
+            interview_type: interviewType.toLowerCase().replace(/\s+/g, "_"),
             job_role: jobRole || undefined,
             difficulty: difficultyLabel.toLowerCase(),
+            interview_goal: interviewGoal || undefined,
+            company_name: companyName || undefined,
+            company_link: companyLink || undefined,
+            job_posting_link: jobPostingLink || undefined,
+            interviewer_persona: interviewerPersona || undefined,
+            resume_highlights: resumeHighlights || undefined,
+            interview_context: interviewContext || undefined,
+            must_cover_topics: mustCoverTopicsInput
+              .split(",")
+              .map((topic) => topic.trim())
+              .filter(Boolean),
           }),
           ...(mode === "presentation" && {
             presentation_topic: presentationTopic || undefined,
@@ -393,6 +412,95 @@ export default function SessionSetupPage() {
                 </div>
 
                 <div>
+                  <label className="text-slate-400 text-[13px] font-medium block mb-2">Interview Goal</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Land a Senior PM role in fintech"
+                    value={interviewGoal}
+                    onChange={(e) => setInterviewGoal(e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg outline-none bg-[#0F172A] border border-[#334155] text-[#F8FAFC] text-sm"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-slate-400 text-[13px] font-medium block mb-2">Company Name</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Stripe"
+                      value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)}
+                      className="w-full px-4 py-3 rounded-lg outline-none bg-[#0F172A] border border-[#334155] text-[#F8FAFC] text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-slate-400 text-[13px] font-medium block mb-2">Interviewer Persona</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Hiring Manager, direct and analytical"
+                      value={interviewerPersona}
+                      onChange={(e) => setInterviewerPersona(e.target.value)}
+                      className="w-full px-4 py-3 rounded-lg outline-none bg-[#0F172A] border border-[#334155] text-[#F8FAFC] text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-slate-400 text-[13px] font-medium block mb-2">Job Posting Link</label>
+                  <input
+                    type="url"
+                    placeholder="https://..."
+                    value={jobPostingLink}
+                    onChange={(e) => setJobPostingLink(e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg outline-none bg-[#0F172A] border border-[#334155] text-[#F8FAFC] text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-slate-400 text-[13px] font-medium block mb-2">Company Link</label>
+                  <input
+                    type="url"
+                    placeholder="https://company-site-or-careers-page"
+                    value={companyLink}
+                    onChange={(e) => setCompanyLink(e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg outline-none bg-[#0F172A] border border-[#334155] text-[#F8FAFC] text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-slate-400 text-[13px] font-medium block mb-2">Resume Highlights</label>
+                  <textarea
+                    placeholder="Paste achievements, impact metrics, and key projects relevant to this interview."
+                    value={resumeHighlights}
+                    onChange={(e) => setResumeHighlights(e.target.value)}
+                    rows={4}
+                    className="w-full px-4 py-3 rounded-lg outline-none bg-[#0F172A] border border-[#334155] text-[#F8FAFC] text-sm resize-y"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-slate-400 text-[13px] font-medium block mb-2">Must-Cover Topics (comma separated)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. leadership, stakeholder management, system design"
+                    value={mustCoverTopicsInput}
+                    onChange={(e) => setMustCoverTopicsInput(e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg outline-none bg-[#0F172A] border border-[#334155] text-[#F8FAFC] text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-slate-400 text-[13px] font-medium block mb-2">Additional Interview Context</label>
+                  <textarea
+                    placeholder="Any special instructions, interview format details, constraints, or expected scenarios."
+                    value={interviewContext}
+                    onChange={(e) => setInterviewContext(e.target.value)}
+                    rows={4}
+                    className="w-full px-4 py-3 rounded-lg outline-none bg-[#0F172A] border border-[#334155] text-[#F8FAFC] text-sm resize-y"
+                  />
+                </div>
+
+                <div>
                   <label className="text-slate-400 text-[13px] font-medium block mb-2">
                     Difficulty: <span style={{ color: difficultyColor }} className="font-semibold">{difficultyLabel}</span>
                   </label>
@@ -559,12 +667,7 @@ export default function SessionSetupPage() {
               {[
                 { label: "Camera", ok: cameraReady, icon: Camera },
                 { label: "Microphone", ok: micReady, icon: Mic },
-                {
-                  label: mode === "presentation" ? "Screen Share Ready" : "Screen Share (Presentation Mode)",
-                  ok: mode === "presentation",
-                  icon: Monitor,
-                  isInfo: mode !== "presentation",
-                },
+                ...(mode === "presentation" ? [{ label: "Screen Share Ready", ok: true, icon: Monitor }] : []),
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between p-4 rounded-xl bg-[#1e1e1e] border border-[#2a2a2a]">
                   <div className="flex items-center gap-3">
@@ -577,11 +680,6 @@ export default function SessionSetupPage() {
                         <CheckCircle size={16} className="text-green-500" />
                         <span className="text-green-500 text-xs font-medium">Connected</span>
                       </>
-                    ) : item.isInfo ? (
-                      <>
-                        <AlertCircle size={16} className="text-amber-400" />
-                        <span className="text-amber-400 text-xs font-medium">Use Presentation Mode</span>
-                      </>
                     ) : (
                       <>
                         <AlertCircle size={16} className="text-red-500" />
@@ -592,7 +690,29 @@ export default function SessionSetupPage() {
                 </div>
               ))}
             </div>
-            
+
+            {mode === "interview" && (
+              <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/25">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-blue-300 text-sm font-semibold">Need to share slides instead?</p>
+                    <p className="text-slate-300 text-xs mt-1">
+                      Screen sharing is only available in Presentation mode. Switch now and continue from setup.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setMode("presentation");
+                      setStep(2);
+                    }}
+                    className="shrink-0 px-3 py-2 rounded-lg bg-blue-500 text-white text-xs font-semibold"
+                  >
+                    Switch to Presentation
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className="grid gap-3">
               <div>
                 <label className="text-slate-400 text-[13px] font-medium block mb-2">Microphone Source</label>

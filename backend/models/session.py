@@ -17,6 +17,7 @@ class InterviewType(str, Enum):
     TECHNICAL = "technical"
     CASE_STUDY = "case_study"
     MIXED = "mixed"
+    OTHER = "other"
 
 
 class SessionConfig(BaseModel):
@@ -28,6 +29,14 @@ class SessionConfig(BaseModel):
     interview_type: Optional[InterviewType] = None
     job_role: Optional[str] = None
     difficulty: Optional[str] = None  # "easy", "medium", "hard"
+    interview_goal: Optional[str] = None
+    company_name: Optional[str] = None
+    company_link: Optional[str] = None
+    job_posting_link: Optional[str] = None
+    interview_context: Optional[str] = None
+    interviewer_persona: Optional[str] = None
+    resume_highlights: Optional[str] = None
+    must_cover_topics: List[str] = []
 
     # Shared fields
     duration_minutes: int = 30

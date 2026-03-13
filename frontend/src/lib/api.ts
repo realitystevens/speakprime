@@ -107,6 +107,14 @@ export interface CreateSessionBody {
     interview_type?: string;
     job_role?: string;
     difficulty?: string;
+    interview_goal?: string;
+    company_name?: string;
+    company_link?: string;
+    job_posting_link?: string;
+    interview_context?: string;
+    interviewer_persona?: string;
+    resume_highlights?: string;
+    must_cover_topics?: string[];
     duration_minutes?: number;
     focus_areas?: string[];
     presentation_topic?: string;
