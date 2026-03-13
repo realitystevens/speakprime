@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  LayoutDashboard, Plus, History, BarChart3, Settings,
+  LayoutDashboard, Plus, History, Settings,
   LogOut, ChevronLeft, ChevronRight, Zap, Menu,
 } from "lucide-react";
 import { userApi, type UserProfile } from "@/lib/api";
@@ -13,7 +13,6 @@ const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
   { icon: Plus, label: "New Session", path: "/session/setup" },
   { icon: History, label: "Session History", path: "/history" },
-  { icon: BarChart3, label: "Reports", path: "/session/report/1" },
   { icon: Settings, label: "Settings", path: "/settings" },
 ];
 
@@ -68,9 +67,7 @@ export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
       {/* Nav Items */}
       <nav className="flex-1 py-4 px-2 space-y-1">
         {navItems.map((item) => {
-          const active =
-            pathname === item.path ||
-            (item.path === "/session/report/1" && pathname.startsWith("/session/report"));
+          const active = pathname === item.path;
           return (
             <Link
               key={item.path}
