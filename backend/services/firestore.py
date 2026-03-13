@@ -332,14 +332,48 @@ class FirestoreService:
 
         def _run():
             db = get_db()
-            sessions_docs = list(
-                db.collection("sessions")
-                .where("user_id", "==", uid)
-                .where("status", "==", "completed")
-                .order_by("created_at", direction="DESCENDING")
-                .stream()
-            )
-            sessions = [doc.to_dict() for doc in sessions_docs]
+
+            def _ensure_datetime(val):
+                from datetime import datetime
+
+                if isinstance(val, datetime):
+                    return val
+                if isinstance(val, str):
+                    try:
+                        return datetime.fromisoformat(val.replace("Z", "+00:00"))
+                    except ValueError:
+                        return None
+                return None
+
+            def _sort_key(s: dict):
+                dt = _ensure_datetime(s.get("created_at"))
+                if dt is not None:
+                    return dt.isoformat()
+                return str(s.get("created_at") or "")
+
+            # Prefer server-side filtering/sorting when available.
+            # If a composite index is missing, fall back to an index-free query.
+            try:
+                sessions_docs = list(
+                    db.collection("sessions")
+                    .where("user_id", "==", uid)
+                    .where("status", "==", "completed")
+                    .order_by("created_at", direction="DESCENDING")
+                    .stream()
+                )
+                sessions = [doc.to_dict() for doc in sessions_docs]
+            except Exception:
+                fallback_docs = list(
+                    db.collection("sessions")
+                    .where("user_id", "==", uid)
+                    .stream()
+                )
+                sessions = [
+                    doc.to_dict()
+                    for doc in fallback_docs
+                    if doc.to_dict().get("status") == "completed"
+                ]
+                sessions.sort(key=_sort_key, reverse=True)
 
             total_sessions = len(sessions)
 
@@ -381,16 +415,6 @@ class FirestoreService:
             from datetime import datetime, timezone
 
             now = datetime.now(timezone.utc)
-
-            def _ensure_datetime(val):
-                if isinstance(val, datetime):
-                    return val
-                if isinstance(val, str):
-                    try:
-                        return datetime.fromisoformat(val.replace("Z", "+00:00"))
-                    except ValueError:
-                        return None
-                return None
 
             def _month_str(val) -> str:
                 dt = _ensure_datetime(val)
