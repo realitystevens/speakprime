@@ -12,11 +12,11 @@ import {
 } from "recharts";
 import { userApi, sessionApi, type UserStats, type Session, type UserProfile } from "@/lib/api";
 
-const statsData = [
-  { label: "Total Sessions", value: "24", icon: BarChart3, trend: "+3 this month", up: true, color: "#3B82F6", bg: "rgba(59,130,246,0.1)" },
-  { label: "Avg. Confidence Score", value: "78%", icon: Award, trend: "+6% this week", up: true, color: "#22C55E", bg: "rgba(34,197,94,0.1)" },
-  { label: "Filler Words (Last Session)", value: "12", icon: MessageSquare, trend: "\u22125 vs last session", up: true, color: "#F59E0B", bg: "rgba(245,158,11,0.1)" },
-  { label: "Improvement Rate", value: "+18%", icon: TrendingUp, trend: "This month", up: true, color: "#8B5CF6", bg: "rgba(139,92,246,0.1)" },
+const statsCardMeta = [
+  { label: "Total Sessions", icon: BarChart3, color: "#3B82F6", bg: "rgba(59,130,246,0.1)" },
+  { label: "Avg. Confidence Score", icon: Award, color: "#22C55E", bg: "rgba(34,197,94,0.1)" },
+  { label: "Filler Words (Last Session)", icon: MessageSquare, color: "#F59E0B", bg: "rgba(245,158,11,0.1)" },
+  { label: "Improvement Rate", icon: TrendingUp, color: "#8B5CF6", bg: "rgba(139,92,246,0.1)" },
 ];
 
 function ScoreBadge({ score }: { score: number }) {
@@ -78,7 +78,12 @@ export default function DashboardPage() {
       { label: "Filler Words (Last Session)", value: String(stats.last_session_filler_words), icon: MessageSquare, trend: "From latest session", up: stats.last_session_filler_words < 10, color: "#F59E0B", bg: "rgba(245,158,11,0.1)" },
       { label: "Improvement Rate", value: `${stats.improvement_rate >= 0 ? "+" : ""}${stats.improvement_rate}%`, icon: TrendingUp, trend: "First vs latest session", up: stats.improvement_rate >= 0, color: "#8B5CF6", bg: "rgba(139,92,246,0.1)" },
     ]
-    : statsData;
+    : statsCardMeta.map((card) => ({
+      ...card,
+      value: loading ? "..." : "—",
+      trend: loading ? "Loading..." : "Unavailable",
+      up: true,
+    }));
 
   return (
     <DashboardLayout>
@@ -101,7 +106,7 @@ export default function DashboardPage() {
 
         {/* Stats Row */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {(loading ? statsData : liveStatsCards).map((stat) => (
+          {liveStatsCards.map((stat) => (
             <div key={stat.label} className={`p-5 rounded-2xl bg-[#1e1e1e] border border-[#2a2a2a] ${loading ? "animate-pulse" : ""}`}>
               <div className="flex items-center justify-between mb-3">
                 <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: stat.bg }}>
